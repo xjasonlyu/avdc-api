@@ -1,27 +1,19 @@
-#!/usr/bin/python3
-# -*- coding: utf-8 -*-
-import sys
-sys.path.append('../')
-import json
 import re
 from urllib.parse import urlencode
 
+from requests import HTTPError
 from lxml import etree
 
-from ADC_function import *
-
-# import sys
-# import io
-# sys.stdout = io.TextIOWrapper(sys.stdout.buffer, errors = 'replace', line_buffering = True)
+from utility.http import get_html
 
 
-def getTitle(text):
+def getTitle(text: str) -> str:
     html = etree.fromstring(text, etree.HTMLParser())
     result = html.xpath('//*[starts-with(@id, "title")]/text()')[0]
     return result
 
 
-def getActor(text):
+def getActor(text: str) -> str:
     # //*[@id="center_column"]/div[2]/div[1]/div/table/tbody/tr[1]/td/text()
     html = etree.fromstring(text, etree.HTMLParser())
     result = (
@@ -29,14 +21,12 @@ def getActor(text):
             html.xpath(
                 "//td[contains(text(),'出演者')]/following-sibling::td/span/a/text()"
             )
-        )
-        .strip(" ['']")
-        .replace("', '", ",")
+        ).strip(" ['']").replace("', '", ",")
     )
     return result
 
 
-def getStudio(text):
+def getStudio(text: str) -> str:
     html = etree.fromstring(text, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     try:
         result = html.xpath(
@@ -49,13 +39,13 @@ def getStudio(text):
     return result
 
 
-def getRuntime(text):
+def getRuntime(text: str) -> str:
     html = etree.fromstring(text, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     result = html.xpath("//td[contains(text(),'収録時間')]/following-sibling::td/text()")[0]
     return re.search(r"\d+", str(result)).group()
 
 
-def getLabel(text):
+def getLabel(text: str) -> str:
     html = etree.fromstring(text, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     try:
         result = html.xpath(
@@ -68,7 +58,7 @@ def getLabel(text):
     return result
 
 
-def getNum(text):
+def getID(text: str) -> str:
     html = etree.fromstring(text, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     try:
         result = html.xpath(
@@ -81,15 +71,7 @@ def getNum(text):
     return result
 
 
-def getYear(getRelease):
-    try:
-        result = str(re.search(r"\d{4}", getRelease).group())
-        return result
-    except:
-        return getRelease
-
-
-def getRelease(text):
+def getRelease(text: str) -> str:
     html = etree.fromstring(text, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     try:
         result = html.xpath(
@@ -117,34 +99,16 @@ def getRelease(text):
     return result.replace("/", "-")
 
 
-def getTag(text):
+def getTags(text: str) -> list[str]:
     html = etree.fromstring(text, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     try:
-        result = html.xpath(
-            "//td[contains(text(),'ジャンル：')]/following-sibling::td/a/text()"
-        )
-        total = []
-        for i in result:
-            try:
-                total.append(translateTag_to_sc(i))
-            except:
-                pass
-        return total
+        result = html.xpath("//td[contains(text(),'ジャンル：')]/following-sibling::td/a/text()")
     except:
-        result = html.xpath(
-            "//td[contains(text(),'ジャンル：')]/following-sibling::td/text()"
-        )
-        total = []
-        for i in result:
-            try:
-                total.append(translateTag_to_sc(i))
-            except:
-                pass
-        return total
+        result = html.xpath("//td[contains(text(),'ジャンル：')]/following-sibling::td/text()")
     return result
 
 
-def getCover(text, number):
+def getCover(text: str, number: str) -> str:
     html = etree.fromstring(text, etree.HTMLParser())
     cover_number = number
     try:
@@ -164,7 +128,7 @@ def getCover(text, number):
     return result
 
 
-def getDirector(text):
+def getDirector(text: str) -> str:
     html = etree.fromstring(text, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     try:
         result = html.xpath(
@@ -177,7 +141,7 @@ def getDirector(text):
     return result
 
 
-def getOutline(text):
+def getOutline(text: str) -> str:
     html = etree.fromstring(text, etree.HTMLParser())
     try:
         result = str(html.xpath("//div[@class='mg-b20 lh4']/text()")[0]).replace(
@@ -194,7 +158,7 @@ def getOutline(text):
     return result
 
 
-def getSeries(text):
+def getSeries(text: str) -> str:
     try:
         html = etree.fromstring(text, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
         try:
@@ -209,27 +173,29 @@ def getSeries(text):
     except:
         return ""
 
-def getExtrafanart(htmlcode):  # 获取剧照
-    html_pather = re.compile(r'<div id=\"sample-image-block\"[\s\S]*?<br></div></div>')
-    html = html_pather.search(htmlcode)
+
+def getImages(content: str) -> list[str]:  # 获取剧照
+    hr = re.compile(r'<div id=\"sample-image-block\"[\s\S]*?<br></div></div>')
+    html = hr.search(content)
     if html:
         html = html.group()
-        extrafanart_pather = re.compile(r'<img.*?src=\"(.*?)\"')
-        extrafanart_imgs = extrafanart_pather.findall(html)
-        if extrafanart_imgs:
+        hf = re.compile(r'<img.*?src=\"(.*?)\"')
+        images = hf.findall(html)
+        if images:
             s = []
-            for img_url in extrafanart_imgs:
+            for img_url in images:
                 img_urls = img_url.rsplit('-', 1)
                 img_url = img_urls[0] + 'jp-' + img_urls[1]
                 s.append(img_url)
             return s
-    return ''
+    return []
 
-def main(number):
+
+def main(number: str) -> dict:
     # fanza allow letter + number + underscore, normalize the input here
     # @note: I only find the usage of underscore as h_test123456789
     fanza_search_number = number
-    # AV_Data_Capture.py.getNumber() over format the input, restore the h_ prefix
+    # AV_Data_Capture.py.getIDber() over format the input, restore the h_ prefix
     if fanza_search_number.startswith("h-"):
         fanza_search_number = fanza_search_number.replace("h-", "h_")
 
@@ -246,82 +212,47 @@ def main(number):
     ]
     chosen_url = ""
 
+    content = None
     for url in fanza_urls:
         chosen_url = url + fanza_search_number
-        htmlcode = get_html(
-            "https://www.dmm.co.jp/age_check/=/declared=yes/?{}".format(
-                urlencode({"rurl": chosen_url})
+        try:
+            content = get_html(
+                "https://www.dmm.co.jp/age_check/=/declared=yes/?{}".format(
+                    urlencode({"rurl": chosen_url})
+                )
             )
-        )
-        if "404 Not Found" not in htmlcode:
+        except HTTPError:
+            continue
+        else:
             break
-    if "404 Not Found" in htmlcode:
-        return json.dumps({"title": "",})
-    try:
-        # for some old page, the input number does not match the page
-        # for example, the url will be cid=test012
-        # but the hinban on the page is test00012
-        # so get the hinban first, and then pass it to following functions
-        fanza_hinban = getNum(htmlcode)
-        data = {
-            "title": getTitle(htmlcode).strip(),
-            "studio": getStudio(htmlcode),
-            "outline": getOutline(htmlcode),
-            "runtime": getRuntime(htmlcode),
-            "director": getDirector(htmlcode) if "anime" not in chosen_url else "",
-            "actor": getActor(htmlcode) if "anime" not in chosen_url else "",
-            "release": getRelease(htmlcode),
-            "number": fanza_hinban,
-            "cover": getCover(htmlcode, fanza_hinban),
-            "imagecut": 1,
-            "tag": getTag(htmlcode),
-            "extrafanart": getExtrafanart(htmlcode),
-            "label": getLabel(htmlcode),
-            "year": getYear(
-                getRelease(htmlcode)
-            ),  # str(re.search('\d{4}',getRelease(a)).group()),
-            "actor_photo": "",
-            "website": chosen_url,
-            "source": "fanza.py",
-            "series": getSeries(htmlcode),
-        }
-    except:
-        data = {
-            "title": "",
-        }
-    js = json.dumps(
-        data, ensure_ascii=False, sort_keys=True, indent=4, separators=(",", ":")
-    )  # .encode('UTF-8')
-    return js
 
+    if content is None:
+        return {}
 
-def main_htmlcode(number):
-    # fanza allow letter + number + underscore, normalize the input here
-    # @note: I only find the usage of underscore as h_test123456789
-    fanza_search_number = number
-    # AV_Data_Capture.py.getNumber() over format the input, restore the h_ prefix
-    if fanza_search_number.startswith("h-"):
-        fanza_search_number = fanza_search_number.replace("h-", "h_")
-
-    fanza_search_number = re.sub(r"[^0-9a-zA-Z_]", "", fanza_search_number).lower()
-
-    fanza_urls = [
-        "https://www.dmm.co.jp/digital/videoa/-/detail/=/cid=",
-        "https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=",
-        "https://www.dmm.co.jp/digital/anime/-/detail/=/cid=",
-        "https://www.dmm.co.jp/mono/anime/-/detail/=/cid=",
-        "https://www.dmm.co.jp/digital/videoc/-/detail/=/cid=",
-        "https://www.dmm.co.jp/digital/nikkatsu/-/detail/=/cid=",
-    ]
-    chosen_url = ""
-    for url in fanza_urls:
-        chosen_url = url + fanza_search_number
-        htmlcode = get_html(chosen_url)
-        if "404 Not Found" not in htmlcode:
-            break
-    if "404 Not Found" in htmlcode:
-        return json.dumps({"title": "",})
-    return htmlcode
+    # for some old page, the input number does not match the page
+    # for example, the url will be cid=test012
+    # but the hinban on the page is test00012
+    # so get the hinban first, and then pass it to following functions
+    fanza_hinban = getID(content)
+    metadata = {
+        "title": getTitle(content).strip(),
+        "studio": getStudio(content),
+        "outline": getOutline(content),
+        "runtime": getRuntime(content),
+        "director": getDirector(content) if "anime" not in chosen_url else "",
+        "actor": getActor(content) if "anime" not in chosen_url else "",
+        "release": getRelease(content),
+        "id": fanza_hinban,
+        "cover": getCover(content, fanza_hinban),
+        "tag": getTags(content),
+        "images": getImages(content),
+        "label": getLabel(content),
+        "actor_photo": "",
+        "website": chosen_url,
+        "source": "fanza",
+        "series": getSeries(content),
+    }
+    return metadata
 
 
 if __name__ == "__main__":
