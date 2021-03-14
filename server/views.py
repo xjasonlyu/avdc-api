@@ -5,12 +5,13 @@ from flask import jsonify
 
 from server import api
 from server import app
-from server.database import sqlite_db
+from server.database import sqlite_db, Metadata, People
 
 
 @app.before_first_request
 def _init_database():
     sqlite_db.init(app.config.get('DATABASE'))
+    sqlite_db.create_tables([Metadata, People])
 
 
 @app.errorhandler(Exception)
