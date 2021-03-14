@@ -4,6 +4,9 @@ services:
 
   avdc:
     image: ghcr.io/xjasonlyu/avdc:latest
+    environment:
+      - HTTP_PROXY=http://192.168.1.1:1080
+      - HTTPS_PROXY=http://192.168.1.1:1080
     ports:
       - 5000:5000
     volumes:
