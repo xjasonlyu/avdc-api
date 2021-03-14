@@ -3,5 +3,11 @@ pyquery
 lxml
 beautifulsoup4
 cloudscraper
-pysocks
+retrying
+cachetools
+peewee
+Pillow
+numpy
+face_recognition
 flask
+Werkzeug

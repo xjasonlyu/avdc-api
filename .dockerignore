@@ -1,0 +1,31 @@
+.git
+.DS_Store
+.gitignore
+.gitattributes
+.dockerignore
+Dockerfile
+
+# General
+*.DS_Store
+.AppleDouble
+.LSOverride
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Exceptions
+.github/
+setup.py
+*.db
+*.md
+*.yml
+*.yaml

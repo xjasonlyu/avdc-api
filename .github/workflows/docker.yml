@@ -1,0 +1,41 @@
+name: Publish Docker Image
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Check out
+        uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: xjasonlyu
+          password: ${{ secrets.CR_PAT }}
+
+      - name: Build and Push
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          platforms: linux/amd64
+          tags: |
+            xjasonlyu/avdc:latest
+            ghcr.io/xjasonlyu/avdc:latest
