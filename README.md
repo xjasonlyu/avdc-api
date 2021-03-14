@@ -2,6 +2,26 @@
 
 AVDC Powered by Flask
 
+## QuickStart
+
+### Clone Project
+
+```shell
+git clone https://github.com/xjasonlyu/AVDC.git
+```
+
+### Install Requirements
+
+```shell
+pip3 install -r requirements.txt
+```
+
+### Run Application
+
+```shell
+python3 main.py
+```
+
 ## Docker
 
 ```text
@@ -11,18 +31,6 @@ docker run -d \
     -e HTTP_PROXY=http://192.168.1.1:1080 \   # optional
     -e HTTPS_PROXY=http://192.168.1.1:1080 \  # optional
     ghcr.io/xjasonlyu/avdc:latest
-```
-
-## Install
-
-```shell
-pip3 install -r requirements.txt
-```
-
-## Run
-
-```shell
-python3 main.py
 ```
 
 ## API
