@@ -9,11 +9,11 @@ from face_recognition import face_locations
 from avdc.utility.httpclient import get_blob
 
 
-def getImageByURL(url: str) -> bytes:
+def getRawImageByURL(url: str) -> bytes:
     return get_blob(url)
 
 
-def getImageFormat(data: bytes) -> Optional[str]:
+def getRawImageFormat(data: bytes) -> Optional[str]:
     # try:
     #     im: Image.Image = Image.open(BytesIO(data))
     # except UnidentifiedImageError:
@@ -36,9 +36,12 @@ def bytesToImage(data: bytes, mode: str = 'RGB') -> np.ndarray:
 
 
 def imageToBytes(img: np.ndarray, fmt: str = 'JPEG') -> bytes:
-    im = Image.fromarray(img)
+    im: Image.Image = Image.fromarray(img)
     buffer = BytesIO()
-    im.save(buffer, format=fmt)
+    im.save(buffer,
+            format=fmt,
+            quality=95,
+            subsampling=0)
     return buffer.getvalue()
 
 
@@ -87,7 +90,7 @@ def autoCropImage(img: np.ndarray, face_detection: bool = True, **kwargs) -> np.
 
 
 if __name__ == '__main__':
-    i = getImageByURL('https://image.mgstage.com/images/shirouto/siro/4386/pb_e_siro-4386.jpg')
+    i = getRawImageByURL('https://image.mgstage.com/images/shirouto/siro/4386/pb_e_siro-4386.jpg')
     # j = autoCropImage(bytesToImage(i))
     # Image.fromarray(j).show()
-    print(getImageFormat(i))
+    print(getRawImageFormat(i))

@@ -14,8 +14,8 @@ from avdc.provider import javlib
 from avdc.provider import mgstage
 from avdc.provider import xcity
 from avdc.utility.image import (autoCropImage,
-                                getImageByURL,
-                                getImageFormat,
+                                getRawImageByURL,
+                                getRawImageFormat,
                                 imageToBytes,
                                 bytesToImage)
 from avdc.utility.metadata import Metadata, joinMetadataCall
@@ -117,8 +117,8 @@ def _getCoverImageByID(_id: str) -> Optional[tuple[str, bytes]]:
     if not m:
         return
 
-    data = getImageByURL(m.cover)
-    fmt = getImageFormat(data)
+    data = getRawImageByURL(m.cover)
+    fmt = getRawImageFormat(data)
     assert fmt is not None
 
     db_operator.StoreCover(m.id, data, fmt)

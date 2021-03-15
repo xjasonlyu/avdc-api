@@ -3,7 +3,7 @@ from typing import Optional
 
 from peewee import DoesNotExist
 
-from avdc.utility.image import getImageFormat
+from avdc.utility.image import getRawImageFormat
 from avdc.utility.metadata import Metadata as _M
 from server.database import Metadata, People, Cover
 
@@ -66,6 +66,6 @@ def StoreCover(_id: str, data: bytes, fmt: Optional[str] = None):
     (Cover
      .insert(id=_id,
              data=data,
-             format=fmt or getImageFormat(data))
+             format=fmt or getRawImageFormat(data))
      .on_conflict_ignore()
      .execute())
