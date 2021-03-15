@@ -1,5 +1,6 @@
 import re
-from typing import Any, Optional
+from functools import wraps
+from typing import Any, Callable, Optional
 
 from avdc.people import gfriends
 from avdc.provider import airav
@@ -19,8 +20,18 @@ from avdc.utility.image import (autoCropImage,
                                 imageToBytes,
                                 bytesToImage)
 from avdc.utility.metadata import Metadata, joinMetadataCall
+from avdc.utility.misc import extractID
 from server import app
 from server import db_operator
+
+
+def extract_id(fn: Callable[[str, bool], Any]):
+    @wraps(fn)
+    def wrapper(_id: str):
+        return fn(*extractID(_id))
+
+    return wrapper
+
 
 _functions = {
     'airav': airav.main,

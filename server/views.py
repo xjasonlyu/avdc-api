@@ -1,23 +1,13 @@
-from functools import wraps
 from http import HTTPStatus
-from typing import Any, Callable
 
 from flask import Response
 from flask import jsonify
 from werkzeug.exceptions import HTTPException
 
-from avdc.utility import misc
+from avdc.utility.misc import extractYear
 from server import api
 from server import app
 from server.database import sqlite_db_init
-
-
-def extract_id(fn: Callable[[str, bool], Any]):
-    @wraps(fn)
-    def wrapper(_id: str):
-        return fn(*misc.extractID(_id))
-
-    return wrapper
 
 
 @app.before_first_request
@@ -54,7 +44,7 @@ def _people(name: str):
 
 
 @app.route('/metadata/<_id>')
-@extract_id
+@api.extract_id
 def _metadata(_id: str, c: bool):
     m = api.GetMetadataByID(_id)
     if not m:
@@ -65,11 +55,11 @@ def _metadata(_id: str, c: bool):
         m.tags.append('中文字幕')
 
     return jsonify(**m.toDict(),
-                   year=misc.extractYear(m.release))
+                   year=extractYear(m.release))
 
 
 @app.route('/image/backdrop/<_id>')
-@extract_id
+@api.extract_id
 def _backdrop(_id: str, _: bool):
     result = api.GetBackdropImageByID(_id)
     if not result:
@@ -80,7 +70,7 @@ def _backdrop(_id: str, _: bool):
 
 
 @app.route('/image/primary/<_id>')
-@extract_id
+@api.extract_id
 def _primary(_id: str, _: bool):
     # dynamic generate primary image
     data = api.GetPrimaryImageByID(_id)
