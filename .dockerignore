@@ -1,7 +1,8 @@
 .git
-.DS_Store
 .gitignore
 .gitattributes
+.dockerignore
+Dockerfile*
 
 # General
 *.DS_Store
@@ -20,9 +21,9 @@ env/
 venv/
 ENV/
 
-# Exceptions
+# Others
 .github/
-**/*.db
-**/*.md
-**/*.yml
-**/*.yaml
+*.db
+*.md
+*.yml
+*.yaml

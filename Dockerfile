@@ -1,12 +1,13 @@
 FROM xjasonlyu/python-dlib:latest
-
-COPY . /
-
-RUN pip install --no-cache-dir -r requirements.txt \
-    && rm -rf requirements.txt
-
 LABEL org.opencontainers.image.source="https://github.com/xjasonlyu/AVDC"
+
+WORKDIR /AVDC
+COPY . /AVDC
+
+RUN pip install --no-cache-dir -U pip \
+    && pip install --no-cache-dir -r requirements.txt \
+    && rm -rf requirements.txt
 
 EXPOSE 5000
 
-ENTRYPOINT ["python", "/main.py"]
+ENTRYPOINT ["python", "-m", "main", "--database", "/avdc.db"]
