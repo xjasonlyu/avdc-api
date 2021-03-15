@@ -1,5 +1,6 @@
 import re
 from datetime import datetime
+from typing import Optional
 
 
 def extractID(_s: str) -> tuple[str, bool]:
@@ -14,11 +15,11 @@ def extractID(_s: str) -> tuple[str, bool]:
     return _s, False
 
 
-def extractYear(_s: str) -> int:
+def extractYear(_s: str) -> Optional[int]:
     try:
         return datetime.strptime(_s, '%Y-%m-%d').year
     except (ValueError, TypeError):
-        return 0
+        return
 
 
 if __name__ == '__main__':

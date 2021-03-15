@@ -64,7 +64,8 @@ def _metadata(_id: str, c: bool):
     if c:  # add chinese subtitle tag
         m.tags.append('中文字幕')
 
-    return jsonify(**m.toDict())
+    return jsonify(**m.toDict(),
+                   year=misc.extractYear(m.release))
 
 
 @app.route('/image/backdrop/<_id>')
