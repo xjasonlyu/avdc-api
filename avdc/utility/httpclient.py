@@ -3,11 +3,11 @@ from typing import Any
 import requests
 
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " \
-             "(KHTML, like Gecko) Chrome/60.0.3100.0 Safari/537.36"
+             "(KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36"
 
 
-def request(url: str,
-            method: str = 'get',
+def request(method: str,
+            url: str,
             data: Any = None,
             cookies: Any = None,
             user_agent: Any = None,
