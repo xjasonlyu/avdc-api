@@ -60,7 +60,7 @@ def _metadata(_id: str, c: bool):
 
 @app.route('/image/backdrop/<_id>')
 @api.extract_id
-def _backdrop(_id: str, _: bool):
+def _backdrop_image(_id: str, _: bool):
     result = api.GetBackdropImageByID(_id)
     if not result:
         return jsonify(status=False,
@@ -71,7 +71,7 @@ def _backdrop(_id: str, _: bool):
 
 @app.route('/image/primary/<_id>')
 @api.extract_id
-def _primary(_id: str, _: bool):
+def _primary_image(_id: str, _: bool):
     # dynamic generate primary image
     data = api.GetPrimaryImageByID(_id)
     if not data:
