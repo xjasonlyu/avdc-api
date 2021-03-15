@@ -35,13 +35,13 @@ def bytesToImage(data: bytes, mode: str = 'RGB') -> np.ndarray:
     return np.array(im)
 
 
-def imageToBytes(img: np.ndarray, fmt: str = 'JPEG') -> bytes:
+def imageToBytes(img: np.ndarray, fmt: str = 'JPEG', quality: int = 95, subsampling: int = 0) -> bytes:
     im: Image.Image = Image.fromarray(img)
     buffer = BytesIO()
     im.save(buffer,
             format=fmt,
-            quality=95,
-            subsampling=0)
+            quality=quality,
+            subsampling=subsampling)
     return buffer.getvalue()
 
 
@@ -58,39 +58,45 @@ def sortFaces(faces: list[tuple[int, int, int, int]], reverse: bool = True):
                reverse=reverse)
 
 
-def cropImage(img: np.ndarray, x: int = -1, scale: float = 0.67) -> np.ndarray:
+def cropImage(img: np.ndarray,
+              x: int = -1,
+              scale: float = 2 / 3,
+              tolerance: float = 0.01,
+              default_to_right: bool = True) -> np.ndarray:
     _height, _width = getImageSize(img)
     width = int(_height * scale)
 
-    if width >= _width:  # no need to crop
-        return img
+    if width >= _width:
+        if abs(_width / _height - scale) <= tolerance:
+            return img  # no need to crop
+        height = int(_width / scale)
+        return img[:min(height, _height), :]  # just fit to top
 
-    if x < 0 or x > _width // 2:  # default to right side
-        return img[:_height, _width - width:_width]
+    if x < 0 or (x > _width // 2 and default_to_right):  # default to right side
+        return img[:, _width - width:_width]
 
     _x = x - (width // 2)
     left = _x if _x > 0 else 0
     right = min(left + width, _width)
-    return img[:_height, left:right]
+    return img[:, left:right]
 
 
-def autoCropImage(img: np.ndarray, face_detection: bool = True, **kwargs) -> np.ndarray:
+def autoCropImage(img: np.ndarray, face_detection: bool = True, **options) -> np.ndarray:
     if not face_detection:
-        return cropImage(img, **kwargs)
+        return cropImage(img, **options)
 
     # find all faces
     faces = findFaces(img)
     sortFaces(faces)  # sort
 
-    if not faces:  # no faces detected
-        return cropImage(img, **kwargs)
-
-    x, _ = getFaceCenter(faces[0])
-    return cropImage(img, x=x, **kwargs)
+    return cropImage(img=img,
+                     x=-1 if not faces  # no faces detected
+                     else getFaceCenter(faces[0])[0],  # x
+                     **options)
 
 
 if __name__ == '__main__':
-    i = getRawImageByURL('https://image.mgstage.com/images/shirouto/siro/4386/pb_e_siro-4386.jpg')
-    # j = autoCropImage(bytesToImage(i))
-    # Image.fromarray(j).show()
-    print(getRawImageFormat(i))
+    i = getRawImageByURL('https://pics.javbus.com/cover/84qz_b.jpg')
+    j = autoCropImage(bytesToImage(i), default_to_right=False)
+    Image.fromarray(j).show()
+    # print(getRawImageFormat(i))
