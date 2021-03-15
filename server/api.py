@@ -16,7 +16,7 @@ from avdc.provider import xcity
 from avdc.utility.image import autoCropImage, getImageByURL, imageToBytes
 from avdc.utility.metadata import Metadata, joinMetadataCall
 from server import app
-from server import operator
+from server import db_operator
 
 _functions = {
     'airav': airav.main,
@@ -68,7 +68,7 @@ def _getRemoteMetadata(_id: str) -> Union[Metadata, None]:
 
 
 def _getLocalMetadata(_id: str) -> Union[Metadata, None]:
-    return operator.GetMetadataByID(_id)
+    return db_operator.GetMetadataByID(_id)
 
 
 def GetMetadataByID(_id: str) -> Union[Metadata, None]:
@@ -95,13 +95,13 @@ def GetMetadataByID(_id: str) -> Union[Metadata, None]:
         return
 
     # store to database
-    operator.StoreMetadata(m)
+    db_operator.StoreMetadata(m)
     app.logger.info(f'store {m.id} to database')
     return m
 
 
 def GetPeopleByName(name: str) -> Union[list[str], None]:
-    images = operator.GetPeopleByName(name)
+    images = db_operator.GetPeopleByName(name)
     if images:
         return images
 
@@ -110,7 +110,7 @@ def GetPeopleByName(name: str) -> Union[list[str], None]:
         return
 
     # store to database
-    operator.StorePeople(name, images)
+    db_operator.StorePeople(name, images)
     app.logger.info(f'store {name} images to database')
     return images
 
@@ -126,9 +126,9 @@ def GetImageByID(_id: str) -> Union[bytes, None]:
 
 
 if __name__ == '__main__':
-    from server.database import sqlite_db
+    from server.database import sqlite_db_init
 
-    sqlite_db.init('../avdc.db')
+    sqlite_db_init('../avdc.db')
 
     print(GetMetadataByID('abp-233'))
     # print(GetPeopleByName('通野未帆'))
