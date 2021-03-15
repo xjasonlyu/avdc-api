@@ -1,5 +1,5 @@
 import re
-from typing import Union, Any
+from typing import Any, Optional
 
 from avdc.people import gfriends
 from avdc.provider import airav
@@ -13,7 +13,11 @@ from avdc.provider import javdb
 from avdc.provider import javlib
 from avdc.provider import mgstage
 from avdc.provider import xcity
-from avdc.utility.image import autoCropImage, getImageByURL, imageToBytes
+from avdc.utility.image import (autoCropImage,
+                                getImageByURL,
+                                getImageFormat,
+                                imageToBytes,
+                                bytesToImage)
 from avdc.utility.metadata import Metadata, joinMetadataCall
 from server import app
 from server import db_operator
@@ -55,7 +59,7 @@ def _getSources(keyword: str) -> list[str]:
     return sources
 
 
-def _getRemoteMetadata(_id: str) -> Union[Metadata, None]:
+def _getRemoteMetadata(_id: str) -> Optional[Metadata]:
     for m in _getSources(_id):
         if not m.strip():
             continue
@@ -67,24 +71,13 @@ def _getRemoteMetadata(_id: str) -> Union[Metadata, None]:
     return
 
 
-def _getLocalMetadata(_id: str) -> Union[Metadata, None]:
+def _getLocalMetadata(_id: str) -> Optional[Metadata]:
     return db_operator.GetMetadataByID(_id)
 
 
-def GetMetadataByID(_id: str) -> Union[Metadata, None]:
+def GetMetadataByID(_id: str) -> Optional[Metadata]:
     def valid(_m: Any) -> bool:
         return _m is not None and isinstance(_m, Metadata)
-
-    def process(_s: str) -> str:
-        _s = _s.strip()
-        _s = _s.split('.', maxsplit=1)[0]
-        _r = re.findall(r'(.*?)([\-._]CD\d)', _s, re.IGNORECASE)
-        if _r:
-            _s = _r[0][0]
-        _s = _s.replace('-c', '').replace('-C', '')
-        return _s
-
-    _id = process(_id)
 
     m = _getLocalMetadata(_id)
     if valid(m):
@@ -100,7 +93,7 @@ def GetMetadataByID(_id: str) -> Union[Metadata, None]:
     return m
 
 
-def GetPeopleByName(name: str) -> Union[list[str], None]:
+def GetPeopleByName(name: str) -> Optional[list[str]]:
     images = db_operator.GetPeopleByName(name)
     if images:
         return images
@@ -115,14 +108,34 @@ def GetPeopleByName(name: str) -> Union[list[str], None]:
     return images
 
 
-def GetImageByID(_id: str) -> Union[bytes, None]:
+def _getCoverImageByID(_id: str) -> Optional[tuple[str, bytes]]:
+    result = db_operator.GetCoverByID(_id)
+    if result:
+        return result  # format, data
+
     m = GetMetadataByID(_id)
-    if m and m.cover:
-        return imageToBytes(
-            autoCropImage(
-                getImageByURL(
-                    m.cover)))
-    return
+    if not m:
+        return
+
+    data = getImageByURL(m.cover)
+    fmt = getImageFormat(data)
+    assert fmt is not None
+
+    db_operator.StoreCover(m.id, data, fmt)
+    return fmt, data
+
+
+def GetBackdropImageByID(_id: str) -> Optional[tuple[str, bytes]]:
+    return _getCoverImageByID(_id)
+
+
+def GetPrimaryImageByID(_id: str) -> Optional[bytes]:
+    result = _getCoverImageByID(_id)
+    if not result:
+        return
+
+    _, data = result
+    return imageToBytes(autoCropImage(bytesToImage(data)))
 
 
 if __name__ == '__main__':

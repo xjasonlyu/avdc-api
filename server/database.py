@@ -8,6 +8,12 @@ sqlite_db = SqliteDatabase(
 )
 
 
+def sqlite_db_init(db: str):
+    sqlite_db.init(database=db)
+    # create table if not exist
+    sqlite_db.create_tables([Metadata, People, Cover])
+
+
 class ArrayField(Field):
     field_type = 'ARRAY'
 
@@ -61,8 +67,11 @@ class People(BasicModel):
     images = ArrayField(null=True)
 
 
+class Cover(BasicModel):
+    id = CharField(primary_key=True, unique=True)
+    format = CharField()
+    data = BlobField()
+
+
 if __name__ == '__main__':
-    sqlite_db.connect()
-    sqlite_db.init('example.db')
-    sqlite_db.create_tables([Metadata, People])
-    sqlite_db.close()
+    sqlite_db_init('example.db')

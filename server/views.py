@@ -1,28 +1,42 @@
+from functools import wraps
 from http import HTTPStatus
+from typing import Any, Callable
 
 from flask import Response
 from flask import jsonify
+from werkzeug.exceptions import HTTPException
 
+from avdc.utility import misc
 from server import api
 from server import app
-from server.database import sqlite_db, Metadata, People
+from server.database import sqlite_db_init
+
+
+def extract_id(fn: Callable[[str, bool], Any]):
+    @wraps(fn)
+    def wrapper(_id: str):
+        return fn(*misc.extractID(_id))
+
+    return wrapper
 
 
 @app.before_first_request
 def _init_database():
-    sqlite_db.init(app.config.get('DATABASE'))
-    sqlite_db.create_tables([Metadata, People])
+    sqlite_db_init(app.config.get('DATABASE'))
 
 
 @app.errorhandler(Exception)
 def _return_json_if_error_occurred(e):
-    if app.debug:
-        # log errors
+    if isinstance(e, HTTPException):
+        status_code = e.code
+    else:
+        status_code = HTTPStatus.INTERNAL_SERVER_ERROR
+        # log exception detail
         app.log_exception(e)
 
-    # JSON responses
+    # JSON response
     return jsonify(status=False,
-                   message=str(e)), HTTPStatus.INTERNAL_SERVER_ERROR
+                   message=str(e)), status_code
 
 
 @app.route('/')
@@ -40,18 +54,36 @@ def _people(name: str):
 
 
 @app.route('/metadata/<_id>')
-def _metadata(_id: str):
+@extract_id
+def _metadata(_id: str, c: bool):
     m = api.GetMetadataByID(_id)
     if not m:
         return jsonify(status=False,
                        message=f'metadata not found: {_id}'), HTTPStatus.NOT_FOUND
+
+    if c:  # add chinese subtitle tag
+        m.tags.append('中文字幕')
+
     return jsonify(**m.toDict())
 
 
-@app.route('/image/<_id>')
-def _image(_id: str):
-    data = api.GetImageByID(_id)
+@app.route('/image/backdrop/<_id>')
+@extract_id
+def _backdrop(_id: str, _: bool):
+    result = api.GetBackdropImageByID(_id)
+    if not result:
+        return jsonify(status=False,
+                       message=f'backdrop image not found: {_id}'), HTTPStatus.NOT_FOUND
+    fmt, data = result
+    return Response(data, mimetype=f'image/{fmt}')
+
+
+@app.route('/image/primary/<_id>')
+@extract_id
+def _primary(_id: str, _: bool):
+    # dynamic generate primary image
+    data = api.GetPrimaryImageByID(_id)
     if not data:
         return jsonify(status=False,
-                       message=f'image not found: {_id}'), HTTPStatus.NOT_FOUND
-    return Response(data, mimetype='image/jpeg')
+                       message=f'primary image not found: {_id}'), HTTPStatus.NOT_FOUND
+    return Response(data, mimetype=f'image/jpeg')
