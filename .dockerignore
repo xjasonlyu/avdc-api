@@ -2,8 +2,6 @@
 .DS_Store
 .gitignore
 .gitattributes
-.dockerignore
-Dockerfile
 
 # General
 *.DS_Store
@@ -24,8 +22,7 @@ ENV/
 
 # Exceptions
 .github/
-setup.py
-*.db
-*.md
-*.yml
-*.yaml
+**/*.db
+**/*.md
+**/*.yml
+**/*.yaml
