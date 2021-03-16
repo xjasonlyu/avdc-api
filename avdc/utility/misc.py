@@ -1,6 +1,12 @@
 import re
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from typing import Optional
+
+
+def concurrentMap(fn, *args, timeout=None, max_workers=None):
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        return tuple(executor.map(fn, *args, timeout=timeout))
 
 
 def extractID(_s: str) -> tuple[str, bool]:
