@@ -1,9 +1,7 @@
-import json
-from collections import Iterable
-from typing import Any, Callable, Union
+from __future__ import annotations
 
-from requests.exceptions import RequestException
-from retrying import retry
+import json
+from typing import Any, Union
 
 
 class MetadataError(Exception):
@@ -12,13 +10,12 @@ class MetadataError(Exception):
 
 class Metadata:
 
-    def __init__(self, *raws: Any):
-        self.id = self._get_id(raws)
-
+    def __init__(self, raw: dict[str, Any]):
         # raw metadata
-        self._raws: tuple[Any] = raws
+        self._raw: dict[str, Any] = raw
 
         # required fields
+        self.id: str = self._get('id', '').strip().upper()
         self.title: str = self._get('title', '')
 
         if not self.id:
@@ -43,11 +40,10 @@ class Metadata:
         self.cover: str = self._get('cover', '')
         self.small_cover: str = self._get('small_cover', '')
         self.images: list[str] = self._get('images', [])
-        # self.star_photos: dict[str, str] = self._get('star_photos', {})
 
         # source fields
-        self.source: list[str] = self._get_list('source')
-        self.website: list[str] = self._get_list('website')
+        self.source: list[str] = self._to_list(self._get('source'))
+        self.website: list[str] = self._to_list(self._get('website'))
 
     def __eq__(self, m) -> bool:
         if not isinstance(m, Metadata):
@@ -60,66 +56,30 @@ class Metadata:
     def __str__(self) -> str:
         return self.toJSON()
 
+    def __add__(self, other: Metadata) -> Metadata:
+        if not isinstance(other, Metadata):
+            raise TypeError(f'invalid type to add: {type(other)}')
+
+        m = {}
+        for k, v in other.toDict().items():
+            if k in ('source', 'website'):
+                m[k] = self.get(k) + v
+            else:
+                m[k] = self.get(k) or v
+
+        return Metadata(m)
+
     @staticmethod
-    def _get_id(raws: Any):
-        if not raws:
-            raise MetadataError('empty raw metadata')
-
-        _id: Union[str, None] = None
-        for r in raws:
-            i: str = r.get('id', '').upper().strip()
-            i = i.replace('_', '-')
-
-            if _id is None:
-                _id = i
-
-            if _id == i:
-                continue
-
-            x = i.replace('-', '').replace('_', '')
-            y = _id.replace('-', '').replace('_', '')
-
-            if x == y \
-                    or x in y \
-                    or y in x:
-                continue
-
-            try:
-                o, p = i.split('-', maxsplit=1)
-                m, n = _id.split('-', maxsplit=1)
-                if m == o and int(n) == int(p):
-                    continue
-            except:
-                pass
-
-            raise MetadataError(f'mismatched id: {_id} != {i}')
-
-        for r in raws:
-            i: str = r.get('id', '').upper().strip()
-            if '-' in i or '_' in i:
-                return i  # prefer `-` in id
-        return raws[0].get('id', '').upper().strip()
+    def _to_list(v: Union[str, list[str]]) -> list[str]:
+        if isinstance(v, str):
+            return [v]
+        elif isinstance(v, list):
+            return [i for i in v]
+        else:
+            return []
 
     def _get(self, key: str, default: Any = None) -> Any:
-        for r in self._raws:
-            value = r.get(key)
-            if not value:
-                continue
-            return value
-        else:
-            return default
-
-    def _get_list(self, key: str) -> list[str]:
-        results = []
-        for r in self._raws:
-            value = r.get(key)
-            if not value:
-                continue
-            if isinstance(value, str):
-                results.append(value)
-            elif isinstance(value, Iterable):
-                results.extend(value)
-        return results
+        return self._raw.get(key) or default
 
     def get(self, key: str, default: Any = None) -> Any:
         if not hasattr(self, key):
@@ -140,36 +100,16 @@ class Metadata:
                 if not k.startswith('_')}
 
 
-def joinMetadataCall(*functions: Callable[[str], Metadata]) -> Callable[[str], Metadata]:
-    def wrapper(v: str) -> Metadata:
-        ml: list[Metadata] = []
-        for fn in functions:
-            try:
-                m = fn(v)
-            except:  # ignore all
-                pass
-            else:
-                ml.append(m)
-        return Metadata(*ml)
-
-    return wrapper
-
-
-def toMetadata(fn: Callable[[str], dict[str, Any]]) -> Callable[[str], Metadata]:
-    @retry(stop_max_attempt_number=3, retry_on_exception=lambda e: isinstance(e, RequestException))
-    def wrapper(s: str) -> Metadata:
-        return Metadata(fn(s))
-
-    return wrapper
-
-
-if __name__ == '__main__':
+def test():
     m1 = Metadata({'id': '0', 'title': 't', 'cover': 'n', 'source': 'ss'})
     m2 = Metadata({'id': '0', 'title': 't', 'cover': 'n', 'source': 'ss'})
     m3 = Metadata({'id': '1', 'title': 't', 'cover': 'm', 'source': 'ss'})
     m4 = Metadata({'id': '0', 'title': 'tt', 'source': 'test', 'website': 'http'})
 
-    assert (m1 == m1 == m2)
-    assert (m1 != m3 and m2 != m3)
+    assert m1 == m1 == m2
+    assert m1 != m3 and m2 != m3
+    assert m1 + m4 == m2 + m4
 
-    print(Metadata(m1, m4))
+
+if __name__ == '__main__':
+    test()
