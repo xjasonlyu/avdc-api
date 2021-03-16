@@ -59,25 +59,31 @@ def sortFaces(faces: list[tuple[int, int, int, int]], reverse: bool = True):
 
 
 def cropImage(img: np.ndarray,
-              x: int = -1,
+              center: int = -1,
               scale: float = 2 / 3,
               tolerance: float = 0.01,
               default_to_right: bool = True) -> np.ndarray:
-    _height, _width = getImageSize(img)
-    width = int(_height * scale)
+    height, width = getImageSize(img)
+    # expected width
+    _width = int(height * scale)
 
-    if width >= _width:
-        if abs(_width / _height - scale) <= tolerance:
-            return img  # no need to crop
-        height = int(_width / scale)
-        return img[:min(height, _height), :]  # just fit to top
+    if _width >= width:
+        if abs(width / height - scale) <= tolerance:
+            # no need to crop
+            return img
 
-    if x < 0 or (x > _width // 2 and default_to_right):  # default to right side
-        return img[:, _width - width:_width]
+        height = int(width / scale)
+        # just fit to top
+        return img[:min(height, height), :]
 
-    _x = x - (width // 2)
-    left = _x if _x > 0 else 0
-    right = min(left + width, _width)
+    # default to right side
+    if center < 0 or (center > width // 2 and default_to_right):
+        left, right = width - _width, width
+        return img[:, left:right]
+
+    x = center - (_width // 2)
+    left = x if x > 0 else 0
+    right = min(left + _width, width)
     return img[:, left:right]
 
 
@@ -85,18 +91,19 @@ def autoCropImage(img: np.ndarray, face_detection: bool = True, **options) -> np
     if not face_detection:
         return cropImage(img, **options)
 
-    # find all faces
+    # find and sort faces
     faces = findFaces(img)
-    sortFaces(faces)  # sort
+    sortFaces(faces)
 
     return cropImage(img=img,
-                     x=-1 if not faces  # no faces detected
+                     center=-1 if not faces  # no faces detected
                      else getFaceCenter(faces[0])[0],  # x
                      **options)
 
 
 if __name__ == '__main__':
-    i = getRawImageByURL('https://pics.javbus.com/cover/84qz_b.jpg')
+    i = getRawImageByURL('https://imgix.pedestrian.tv/content/uploads/2021/01/14/'
+                         'Ted-Mosby.jpg?ar=16%3A9&auto=format&crop=focal&fit=crop&q=65&w=1200')
     j = autoCropImage(bytesToImage(i), default_to_right=False)
     Image.fromarray(j).show()
     # print(getRawImageFormat(i))
