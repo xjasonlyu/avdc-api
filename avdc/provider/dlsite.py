@@ -1,7 +1,8 @@
 from lxml import etree
 
 from avdc.utility.httpclient import get_html
-from avdc.utility.metadata import toMetadata
+from avdc.utility.metadata import Metadata
+from avdc.utility.misc import extractTitle
 
 
 # print(get_html('https://www.dlsite.com/pro/work/=/product_id/VJ013152.html'))
@@ -18,144 +19,137 @@ from avdc.utility.metadata import toMetadata
 
 
 def getTitle(a: str) -> str:
-    html = etree.fromstring(a, etree.HTMLParser())
-    result = html.xpath('//*[@id="work_name"]/a/text()')[0]
-    return result
+    tree = etree.fromstring(a, etree.HTMLParser())
+    title = tree.xpath('//*[@id="work_name"]/a/text()')[0]
+    return extractTitle(title)
 
 
 def getStars(a: str) -> list[str]:  # //*[@id="center_column"]/div[2]/div[1]/div/table/tbody/tr[1]/td/text()
-    html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-    try:
-        result = html.xpath('//th[contains(text(),"声优")]/../td/a/text()')
-    except:
-        result = []
-    return result
+    tree = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
+    return tree.xpath('//th[contains(text(),"声优")]/../td/a/text()')
 
 
 def getStudio(a: str) -> str:
-    html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
+    tree = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     try:
         try:
-            result = html.xpath('//th[contains(text(),"系列名")]/../td/span[1]/a/text()')[0]
-        except:
-            result = html.xpath('//th[contains(text(),"社团名")]/../td/span[1]/a/text()')[0]
-    except:
+            result = tree.xpath('//th[contains(text(),"系列名")]/../td/span[1]/a/text()')[0]
+        except (IndexError, Exception):
+            result = tree.xpath('//th[contains(text(),"社团名")]/../td/span[1]/a/text()')[0]
+    except (IndexError, Exception):
         result = ''
     return result
 
 
 def getRuntime(a: str) -> str:
-    html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-    result1 = str(html.xpath('//strong[contains(text(),"時長")]/../span/text()')).strip(" ['']")
-    result2 = str(html.xpath('//strong[contains(text(),"時長")]/../span/a/text()')).strip(" ['']")
+    tree = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
+    result1 = str(tree.xpath('//strong[contains(text(),"時長")]/../span/text()')).strip(" ['']")
+    result2 = str(tree.xpath('//strong[contains(text(),"時長")]/../span/a/text()')).strip(" ['']")
     return str(result1 + result2).strip('+').rstrip('mi')
 
 
 def getLabel(a: str) -> str:
-    html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
+    tree = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     try:
         try:
-            result = html.xpath('//th[contains(text(),"系列名")]/../td/span[1]/a/text()')[0]
-        except:
-            result = html.xpath('//th[contains(text(),"社团名")]/../td/span[1]/a/text()')[0]
-    except:
+            result = tree.xpath('//th[contains(text(),"系列名")]/../td/span[1]/a/text()')[0]
+        except (IndexError, Exception):
+            result = tree.xpath('//th[contains(text(),"社团名")]/../td/span[1]/a/text()')[0]
+    except (IndexError, Exception):
         result = ''
     return result
 
 
 def getRelease(a: str) -> str:
-    html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-    result = html.xpath('//th[contains(text(),"贩卖日")]/../td/a/text()')[0]
+    tree = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
+    result = tree.xpath('//th[contains(text(),"贩卖日")]/../td/a/text()')[0]
     return result.replace('年', '-').replace('月', '-').replace('日', '')
 
 
 def getTags(a: str) -> list[str]:
-    html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-    try:
-        result = html.xpath('//th[contains(text(),"分类")]/../td/div/a/text()')
-        return result
-    except:
-        return []
+    tree = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
+    return tree.xpath('//th[contains(text(),"分类")]/../td/div/a/text()')
 
 
 def getSmallCover(a: str, index: int = 0) -> str:
     # same issue mentioned below,
     # javdb sometime returns multiple results
     # DO NOT just get the first one, get the one with correct index number
-    html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
+    tree = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     try:
-        result = html.xpath("//div[@class='item-image fix-scale-cover']/img/@src")[index]
-        if not 'https' in result:
+        result = tree.xpath("//div[@class='item-image fix-scale-cover']/img/@src")[index]
+        if 'https' not in result:
             result = 'https:' + result
         return result
-    except:  # 2020.7.17 Repair Cover Url crawl
-        result = html.xpath("//div[@class='item-image fix-scale-cover']/img/@data-src")[index]
+    except (IndexError, Exception):  # 2020.7.17 Repair Cover Url crawl
+        result = tree.xpath("//div[@class='item-image fix-scale-cover']/img/@data-src")[index]
         if 'https' not in result:
             result = 'https:' + result
         return result
 
 
-def getCover(content: str) -> str:
-    html = etree.fromstring(content, etree.HTMLParser())
-    result = html.xpath('//*[@id="work_left"]/div/div/div[2]/div/div[1]/div[1]/ul/li/img/@src')[0]
+def getCover(text: str) -> str:
+    tree = etree.fromstring(text, etree.HTMLParser())
+    result = tree.xpath('//*[@id="work_left"]/div/div/div[2]/div/div[1]/div[1]/ul/li/img/@src')[0]
     return result
 
 
 def getDirector(a: str) -> str:
-    html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
+    tree = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     try:
-        result = html.xpath('//th[contains(text(),"剧情")]/../td/a/text()')[0]
-    except:
+        result = tree.xpath('//th[contains(text(),"剧情")]/../td/a/text()')[0]
+    except (IndexError, Exception):
         result = ''
     return result
 
 
-def getOverview(content: str) -> str:
-    html = etree.fromstring(content, etree.HTMLParser())
+def getOverview(text: str) -> str:
+    tree = etree.fromstring(text, etree.HTMLParser())
     total = []
-    result = html.xpath('//*[@id="main_inner"]/div[3]/text()')
+    result = tree.xpath('//*[@id="main_inner"]/div[3]/text()')
     for i in result:
         total.append(i.strip('\r\n'))
     return str(total).strip(" ['']").replace("', '', '", r'\n').replace("', '", r'\n').strip(", '', '")
 
 
 def getSeries(a: str) -> str:
-    html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
+    tree = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     try:
         try:
-            result = html.xpath('//th[contains(text(),"系列名")]/../td/span[1]/a/text()')[0]
-        except:
-            result = html.xpath('//th[contains(text(),"社团名")]/../td/span[1]/a/text()')[0]
-    except:
+            result = tree.xpath('//th[contains(text(),"系列名")]/../td/span[1]/a/text()')[0]
+        except (IndexError, Exception):
+            result = tree.xpath('//th[contains(text(),"社团名")]/../td/span[1]/a/text()')[0]
+    except (IndexError, Exception):
         result = ''
     return result
 
 
-@toMetadata
-def main(number: str) -> dict:
-    number = number.upper()
-    content = get_html('https://www.dlsite.com/pro/work/=/product_id/' + number + '.html',
-                       cookies={'locale': 'zh-cn'})
+def main(keyword: str) -> Metadata:
+    keyword = keyword.upper()
 
-    metadata = {
-        'stars': getStars(content),
-        'title': getTitle(content),
-        'studio': getStudio(content),
-        'overview': getOverview(content),
+    url = f'https://www.dlsite.com/pro/work/=/product_id/{keyword}.html'
+    text = get_html(url,
+                    cookies={'locale': 'zh-cn'},
+                    raise_for_status=True)
+
+    return Metadata({
+        'stars': getStars(text),
+        'title': getTitle(text),
+        'studio': getStudio(text),
+        'overview': getOverview(text),
         'runtime': '',
-        'director': getDirector(content),
-        'release': getRelease(content),
-        'id': number,
-        'cover': 'https:' + getCover(content),
+        'director': getDirector(text),
+        'release': getRelease(text),
+        'id': keyword,
+        'cover': 'https:' + getCover(text),
         # 'small_cover': '',
-        'tags': getTags(content),
-        'label': getLabel(content),
+        'tags': getTags(text),
+        'label': getLabel(text),
         # 'star_photos': '',
-        'website': 'https://www.dlsite.com/pro/work/=/product_id/' + number + '.html',
+        'website': url,
         'source': 'dlsite',
-        'series': getSeries(content),
-    }
-    return metadata
+        'series': getSeries(text),
+    })
 
 
 if __name__ == "__main__":
