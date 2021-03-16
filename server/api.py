@@ -20,7 +20,7 @@ from avdc.utility.image import (autoCropImage,
                                 imageToBytes,
                                 bytesToImage)
 from avdc.utility.metadata import Metadata, joinMetadataCall
-from avdc.utility.misc import extractID
+from avdc.utility.misc import parseVID
 from server import app
 from server import db_operator
 
@@ -28,7 +28,7 @@ from server import db_operator
 def extract_id(fn: Callable[[str, bool], Any]):
     @wraps(fn)
     def wrapper(_id: str):
-        return fn(*extractID(_id))
+        return fn(*parseVID(_id))
 
     return wrapper
 
