@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Callable, Optional, Union
 
 from requests import sessions, Response
 from requests.structures import CaseInsensitiveDict
@@ -30,12 +30,21 @@ class Session(sessions.Session):
 def request(method: str,
             url: str,
             user_agent: Optional[str] = None,
+            raise_for_status: Union[bool, Callable[[Response], bool]] = False,
             **kwargs) -> Response:
     # By using the 'with' statement we are sure the session is closed, thus we
     # avoid leaving sockets open which can trigger a ResourceWarning in some
     # cases, and look like a memory leak in others.
     with Session(user_agent) as session:
-        return session.request(method=method, url=url, **kwargs)
+        # do http request
+        response = session.request(method=method, url=url, **kwargs)
+
+        # status code check
+        if isinstance(raise_for_status, bool) and raise_for_status \
+                or callable(raise_for_status) and raise_for_status(response):
+            response.raise_for_status()
+
+        return response
 
 
 def head(url: str, **kwargs) -> Response:
