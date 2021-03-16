@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+from cachetools import cached, TTLCache
 from lxml import etree
 
 from avdc.utility.httpclient import get_html
@@ -78,9 +79,14 @@ def getSeries(content: str) -> str:
     return str(tree.xpath('//span[contains(text(),"系列:")]/../span[2]/text()')).strip(" ['']")
 
 
-def main(keyword: str) -> Metadata:
+@cached(cache=TTLCache(maxsize=1, ttl=3600))
+def _getAvsoxSite() -> str:
     text = get_html('https://tellme.pw/avsox')
-    avsox_site = etree.HTML(text).xpath('//div[@class="container"]/div/a/@href')[0]
+    return etree.HTML(text).xpath('//div[@class="container"]/div/a/@href')[0]
+
+
+def main(keyword: str) -> Metadata:
+    avsox_site = _getAvsoxSite()
 
     def search_url(v):
         x = get_html(avsox_site + '/cn/search/' + v)

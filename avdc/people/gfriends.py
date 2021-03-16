@@ -9,7 +9,7 @@ from avdc.utility.httpclient import get_html
 REPO_URL = 'https://raw.githubusercontent.com/xinxin8816/gfriends/master'
 
 
-@cached(cache=TTLCache(maxsize=1, ttl=600))
+@cached(cache=TTLCache(maxsize=1, ttl=3600))
 def _getIndex() -> dict:
     text = get_html(REPO_URL + '/Filetree.json')
     return json.loads(text)
