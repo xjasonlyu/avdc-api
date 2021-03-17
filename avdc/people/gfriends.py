@@ -31,8 +31,8 @@ def search(name: str) -> list[str]:
     for studio in content:
         for img in content[studio]:
             if name == splitext(img)[0]:
-                target = content[studio][img]
-                results.append('/'.join([REPO_URL, 'Content', quote(studio), quote(target)]))
+                results.append('/'.join([REPO_URL, 'Content',
+                                         quote(studio), quote(content[studio][img])]))
 
     if results:  # auto sort by image height
         sizes = concurrentMap(getImageHeight, results, max_workers=len(results))
