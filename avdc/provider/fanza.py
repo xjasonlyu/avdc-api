@@ -3,6 +3,7 @@ from urllib.parse import urlencode
 
 from lxml import etree
 
+from avdc.provider import NotFound
 from avdc.utility.httpclient import get_html
 from avdc.utility.metadata import Metadata
 from avdc.utility.misc import extractTitle
@@ -224,6 +225,9 @@ def main(keyword: str) -> Metadata:
         )
         if "404 Not Found" not in text:
             break
+
+    if not text or "404 Not Found" in text:
+        raise NotFound(f'fanza: {keyword} not found')
 
     # for some old page, the input number does not match the page
     # for example, the url will be cid=test012

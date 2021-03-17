@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 from cachetools import cached, TTLCache
 from lxml import etree
 
+from avdc.provider import NotFound
 from avdc.utility.httpclient import get_html
 from avdc.utility.metadata import Metadata
 from avdc.utility.misc import extractTitle
@@ -94,6 +95,9 @@ def main(keyword: str) -> Metadata:
         return str(tree.xpath('//*[@id="waterfall"]/div/a/@href')).strip(" ['']"), x
 
     url, search_page = search_url(keyword)
+
+    if url.count('https://') > 2:
+        raise NotFound(f'javsox: {keyword} not found')
 
     text = get_html(url, raise_for_status=True)
     soup = BeautifulSoup(text, 'lxml')

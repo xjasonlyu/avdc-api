@@ -2,6 +2,7 @@ import re
 
 from lxml import etree
 
+from avdc.provider import NotFound
 from avdc.utility.httpclient import get_html
 from avdc.utility.metadata import Metadata
 
@@ -65,7 +66,7 @@ def main(keyword: str) -> Metadata:
     text = get_html(url)
 
     if 'The product you were looking for was not found.' in text:
-        raise ValueError(f'fc2: {keyword} not found')
+        raise NotFound(f'fc2: {keyword} not found')
 
     return Metadata({
         'title': getTitle(text),
