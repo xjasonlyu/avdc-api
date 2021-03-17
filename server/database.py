@@ -34,37 +34,35 @@ class Metadata(BasicModel):
     title = TextField()
 
     # info fields
-    overview = TextField(null=True)
-    tags = ArrayField(null=True)
-    label = TextField(null=True)
-    studio = TextField(null=True)
-    series = TextField(null=True)
-    runtime = IntegerField(null=True)
+    overview = TextField()
+    tags = ArrayField()
+    label = TextField()
+    studio = TextField()
+    series = TextField()
+    runtime = IntegerField()
 
     # cast fields
-    stars = ArrayField(null=True)
-    director = TextField(null=True)
+    stars = ArrayField()
+    director = TextField()
 
     # image fields
-    cover = TextField(null=True)
-    small_cover = TextField(null=True)
-    images = ArrayField(null=True)
+    cover = TextField()
+    images = ArrayField()
 
     # source fields
-    source = ArrayField(null=True)
-    website = ArrayField(null=True)
+    source = ArrayField()
+    website = ArrayField()
 
     # date fields
-    release = DateField(null=True)
+    release = DateField()
 
     # datetime fields
-    created = DateTimeField(default=datetime.now)
-    updated = DateTimeField(null=True)
+    last_modified = DateTimeField(default=datetime.now)
 
 
 class People(BasicModel):
     name = CharField(primary_key=True, unique=True)
-    images = ArrayField(null=True)
+    images = ArrayField()
 
 
 class Cover(BasicModel):

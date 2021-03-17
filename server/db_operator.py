@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Optional
 
 from peewee import DoesNotExist
@@ -19,20 +18,10 @@ def GetMetadataByVID(vid: str) -> Optional[_M]:
     return _M(result.__data__)
 
 
-def UpdateMetadata(metadata: _M):
-    m = metadata.toDict()
-    m.update(updated=datetime.now())
-
-    (Metadata
-     .update(m)
-     .where(Metadata.vid == metadata.vid)
-     .execute())
-
-
-def StoreMetadata(metadata: _M):
+def StoreMetadata(metadata: _M, update: bool = False):
     (Metadata
      .insert(**metadata.toDict())
-     .on_conflict_ignore()
+     .on_conflict('REPLACE' if update else 'IGNORE')
      .execute())
 
 
@@ -44,10 +33,10 @@ def GetPeopleByName(name: str) -> Optional[list[str]]:
     return results.images
 
 
-def StorePeople(name: str, images: list[str]):
+def StorePeople(name: str, images: list[str], update: bool = False):
     (People
      .insert(name=name, images=images)
-     .on_conflict_ignore()
+     .on_conflict('REPLACE' if update else 'IGNORE')
      .execute())
 
 
@@ -62,10 +51,10 @@ def GetCoverByVID(vid: str) -> Optional[tuple[str, bytes]]:
     return result.format, result.data
 
 
-def StoreCover(vid: str, data: bytes, fmt: Optional[str] = None):
+def StoreCover(vid: str, data: bytes, fmt: Optional[str] = None, update: bool = False):
     (Cover
      .insert(vid=vid,
              data=data,
              format=fmt or getRawImageFormat(data))
-     .on_conflict_ignore()
+     .on_conflict('REPLACE' if update else 'IGNORE')
      .execute())
