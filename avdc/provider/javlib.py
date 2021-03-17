@@ -123,29 +123,29 @@ def main(keyword: str) -> Metadata:
         lx = html.fromstring(str(soup))
 
         metadata = {
-            "title": get_title(lx, soup),
-            "studio": get_table_el_single_anchor(soup, "video_maker"),
-            # "year": get_table_el_td(soup, "video_date")[:4],
-            "overview": "",
-            "director": get_table_el_single_anchor(soup, "video_director"),
-            "cover": getCover(lx),
-            # "star_photos": "",
-            "website": result.url,
-            "source": "javlib",
-            "stars": get_table_el_multi_anchor(soup, "video_cast").split(","),
-            "label": get_table_el_td(soup, "video_label"),
-            "tags": get_table_el_multi_anchor(soup, "video_genres").split(","),
-            "id": get_table_el_td(soup, "video_id"),
-            "release": get_table_el_td(soup, "video_date"),
-            "runtime": get_from_xpath(lx, '//*[@id="video_length"]/table/tr/td[2]/span/text()'),
-            "series": '',
+            'title': get_title(lx, soup),
+            'studio': get_table_el_single_anchor(soup, 'video_maker'),
+            # 'year': get_table_el_td(soup, 'video_date')[:4],
+            'overview': '',
+            'director': get_table_el_single_anchor(soup, 'video_director'),
+            'cover': getCover(lx),
+            # 'star_photos': '',
+            'website': result.url,
+            'source': 'javlib',
+            'stars': get_table_el_multi_anchor(soup, 'video_cast').split(','),
+            'label': get_table_el_td(soup, 'video_label'),
+            'tags': get_table_el_multi_anchor(soup, 'video_genres').split(','),
+            'id': get_table_el_td(soup, 'video_id'),
+            'release': get_table_el_td(soup, 'video_date'),
+            'runtime': get_from_xpath(lx, '//*[@id="video_length"]/table/tr/td[2]/span/text()'),
+            'series': '',
         }
 
     return Metadata(metadata)
 
 
-if __name__ == "__main__":
-    lists = ["DVMC-003", "MIAE-003", "JKREZ-001", "KMHRS-010", "KNSD-023"]
-    # lists = ["DVMC-003"]
+if __name__ == '__main__':
+    lists = ['DVMC-003', 'MIAE-003', 'JKREZ-001', 'KMHRS-010', 'KNSD-023']
+    # lists = ['DVMC-003']
     for num in lists:
         print(main(num))

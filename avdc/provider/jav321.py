@@ -131,44 +131,44 @@ def parse_info(soup: BeautifulSoup) -> dict:
             data_dic[get_bold_text(h=d)] = d
 
         return {
-            "stars": getStars(data_dic),
-            "label": getLabel(data_dic),
-            "studio": getStudio(data_dic),
-            "tags": getTags(data_dic),
-            "id": getID(data_dic),
-            "release": getRelease(data_dic),
-            "runtime": getRuntime(data_dic),
-            "series": getSeries(data_dic),
+            'stars': getStars(data_dic),
+            'label': getLabel(data_dic),
+            'studio': getStudio(data_dic),
+            'tags': getTags(data_dic),
+            'id': getID(data_dic),
+            'release': getRelease(data_dic),
+            'runtime': getRuntime(data_dic),
+            'series': getSeries(data_dic),
         }
     else:
         return {}
 
 
 def main(keyword: str) -> Metadata:
-    r = post(url="https://www.jav321.com/search", data={"sn": keyword})
+    r = post(url='https://www.jav321.com/search', data={'sn': keyword})
 
-    soup = BeautifulSoup(r.text, "html.parser")
+    soup = BeautifulSoup(r.text, 'html.parser')
     lx = html.fromstring(str(soup))
 
     metadata = {}
-    if "/video/" in r.url:
+    if '/video/' in r.url:
         data = parse_info(soup)
 
         metadata = {
-            "title": getTitle(lx),
-            # "year": getYear(data),
-            "overview": getOverview(lx),
-            "director": "",
-            "cover": getCover(lx),
-            "images": getImages(r.text),
-            # "star_photos": "",
-            "website": r.url,
-            "source": "jav321",
+            'title': getTitle(lx),
+            # 'year': getYear(data),
+            'overview': getOverview(lx),
+            'director': '',
+            'cover': getCover(lx),
+            'images': getImages(r.text),
+            # 'star_photos': '',
+            'website': r.url,
+            'source': 'jav321',
             **data,
         }
     return Metadata(metadata)
 
 
-if __name__ == "__main__":
-    # print(main("miae-003"))
-    print(main("ABP-110"))
+if __name__ == '__main__':
+    # print(main('miae-003'))
+    print(main('ABP-110'))
