@@ -45,7 +45,7 @@ _functions = {
     'dlsite': dlsite.main,
 }
 
-_priority = 'javbus+jav321,mgstage,avsox,javdb,javlib,fanza,xcity,fc2'
+_priority = 'javbus+jav321,mgstage,avsox,javdb'
 
 
 def _getSources(keyword: str) -> list[str]:
@@ -93,43 +93,46 @@ def _getLocalMetadata(vid: str) -> Optional[Metadata]:
     return db_operator.GetMetadataByVID(vid)
 
 
-def GetMetadataByVID(vid: str) -> Optional[Metadata]:
+def GetMetadataByVID(vid: str, update: bool = False) -> Optional[Metadata]:
     def valid(_m: Any) -> bool:
-        return _m is not None and isinstance(_m, Metadata)
+        return isinstance(_m, Metadata)
 
-    m = _getLocalMetadata(vid)
-    if valid(m):
-        return m
+    if not update:  # try from database
+        m = _getLocalMetadata(vid)
+        if valid(m):
+            return m
 
     m = _getRemoteMetadata(vid)
     if not valid(m):
         return
 
     # store to database
-    db_operator.StoreMetadata(m)
+    db_operator.StoreMetadata(m, update=update)
     app.logger.info(f'store {m.vid} to database')
     return m
 
 
-def GetPeopleByName(name: str) -> Optional[list[str]]:
-    images = db_operator.GetPeopleByName(name)
-    if images:
-        return images
+def GetPeopleByName(name: str, update: bool = False) -> Optional[list[str]]:
+    if not update:
+        images = db_operator.GetPeopleByName(name)
+        if images:
+            return images
 
     images = gfriends.search(name)
     if not images:
         return
 
     # store to database
-    db_operator.StorePeople(name, images)
+    db_operator.StorePeople(name, images, update=update)
     app.logger.info(f'store {name} images to database')
     return images
 
 
-def _getCoverImageByVID(vid: str) -> Optional[tuple[str, bytes]]:
-    result = db_operator.GetCoverByVID(vid)
-    if result:
-        return result  # format, data
+def _getCoverImageByVID(vid: str, update: bool = False) -> Optional[tuple[str, bytes]]:
+    if not update:
+        result = db_operator.GetCoverByVID(vid)
+        if result:
+            return result  # format, data
 
     m = GetMetadataByVID(vid)
     if not m:
@@ -139,16 +142,16 @@ def _getCoverImageByVID(vid: str) -> Optional[tuple[str, bytes]]:
     fmt = getRawImageFormat(data)
     assert fmt is not None
 
-    db_operator.StoreCover(m.vid, data, fmt)
+    db_operator.StoreCover(m.vid, data, fmt, update=update)
     return fmt, data
 
 
-def GetBackdropImageByVID(vid: str) -> Optional[tuple[str, bytes]]:
-    return _getCoverImageByVID(vid)
+def GetBackdropImageByVID(vid: str, *args, **kwargs) -> Optional[tuple[str, bytes]]:
+    return _getCoverImageByVID(vid, *args, **kwargs)
 
 
-def GetPrimaryImageByVID(vid: str) -> Optional[bytes]:
-    result = _getCoverImageByVID(vid)
+def GetPrimaryImageByVID(vid: str, *args, **kwargs) -> Optional[bytes]:
+    result = _getCoverImageByVID(vid, *args, **kwargs)
     if not result:
         return
 
@@ -157,11 +160,11 @@ def GetPrimaryImageByVID(vid: str) -> Optional[bytes]:
 
 
 if __name__ == '__main__':
-    # from server.database import sqlite_db_init
+    # from server.database import sqlite_db_init, Metadata
     #
     # sqlite_db_init('../avdc.db')
     #
-    # print(GetMetadataByVID('abp-233'))
+    print(GetMetadataByVID('abp-233', update=True))
     # print(GetPeopleByName('通野未帆'))
-    print(_getRemoteMetadata('drm-003'))
+    # print(_getRemoteMetadata('drm-003'))
     # models.UpdateMetadata(m)
