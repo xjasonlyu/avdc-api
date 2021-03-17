@@ -18,10 +18,10 @@ class ArrayField(Field):
     field_type = 'ARRAY'
 
     def db_value(self, value: list[str]) -> str:
-        return ','.join(i.strip() for i in value)
+        return ','.join(v for v in value)
 
     def python_value(self, value: str) -> list[str]:
-        return value.strip().split(',')
+        return value.split(',') if value else []
 
 
 class BasicModel(Model):

@@ -19,11 +19,6 @@ class Metadata:
         self.vid: str = self._get('vid', '').strip().upper()
         self.title: str = self._get('title', '')
 
-        if not self.vid:
-            raise MetadataError('metadata missing vid')
-        if not self.title:
-            raise MetadataError('metadata missing title')
-
         # info fields
         self.overview: str = self._get('overview', '')
         self.release: str = str(self._get('release', ''))
@@ -44,6 +39,13 @@ class Metadata:
         # source fields
         self.source: list[str] = self._to_list(self._get('source'))
         self.website: list[str] = self._to_list(self._get('website'))
+
+        if not self.vid:
+            raise MetadataError('metadata missing vid')
+        if not self.title:
+            raise MetadataError('metadata missing title')
+        if not self.cover:
+            raise MetadataError('metadata missing cover')
 
     def __eq__(self, m) -> bool:
         if not isinstance(m, Metadata):
