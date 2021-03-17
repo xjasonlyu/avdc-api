@@ -36,7 +36,7 @@ def extract_vid(fn: Callable[[str, bool], Any]):
 def str_to_bool(s: str) -> bool:
     try:
         return True if json.loads(s) else False
-    except json.decoder.JSONDecodeError:
+    except (TypeError, json.decoder.JSONDecodeError):
         return False
 
 
