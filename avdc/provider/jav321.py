@@ -1,11 +1,10 @@
-import json
 import re
 
 from bs4 import BeautifulSoup
 from lxml import html
 
-from avdc.utility.httpclient import request
-from avdc.utility.metadata import toMetadata
+from avdc.utility.httpclient import post
+from avdc.utility.metadata import Metadata
 
 
 def get_bold_text(h: str) -> str:
@@ -145,9 +144,8 @@ def parse_info(soup: BeautifulSoup) -> dict:
         return {}
 
 
-@toMetadata
-def main(number: str) -> json:
-    r = request(method='post', url="https://www.jav321.com/search", data={"sn": number})
+def main(keyword: str) -> Metadata:
+    r = post(url="https://www.jav321.com/search", data={"sn": keyword})
 
     soup = BeautifulSoup(r.text, "html.parser")
     lx = html.fromstring(str(soup))
@@ -168,7 +166,7 @@ def main(number: str) -> json:
             "source": "jav321",
             **data,
         }
-    return metadata
+    return Metadata(metadata)
 
 
 if __name__ == "__main__":

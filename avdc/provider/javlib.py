@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from lxml import html
 
 from avdc.utility.httpclient import request
-from avdc.utility.metadata import toMetadata
+from avdc.utility.metadata import Metadata
 
 
 def get_from_xpath(lx: html.HtmlElement, xpath: str) -> str:
@@ -60,13 +60,12 @@ def get_javlib_cookie() -> tuple[str, str]:
     return cloudscraper.get_cookie_string("http://www.m45e.com/")
 
 
-@toMetadata
-def main(number: str) -> dict:
+def main(keyword: str) -> Metadata:
     raw_cookies, user_agent = get_javlib_cookie()
 
     # Blank cookies mean javlib site return error
     if not raw_cookies:
-        return {}
+        raise Exception('javlib: get blank cookie')
 
     # Manually construct a dictionary
     s_cookie = SimpleCookie()
@@ -78,7 +77,7 @@ def main(number: str) -> dict:
     # Scraping
     result = request(
         method='get',
-        url="http://www.javlibrary.com/cn/vl_searchbyid.php?keyword={}".format(number),
+        url="http://www.javlibrary.com/cn/vl_searchbyid.php?keyword={}".format(keyword),
         cookies=cookies,
         user_agent=user_agent,
     )
@@ -108,13 +107,13 @@ def main(number: str) -> dict:
             "runtime": get_from_xpath(lx, '//*[@id="video_length"]/table/tr/td[2]/span/text()'),
             "series": '',
         }
-    elif number.upper() in fanhao:
+    elif keyword.upper() in fanhao:
         url_pather = re.compile(r'<a href="(.*?)".*?><div class="id">(.*?)</div>')
         s = {}
         url_list = url_pather.findall(result.text)
         for url in url_list:
             s[url[1]] = 'http://www.javlibrary.com/cn/' + url[0].lstrip('.')
-        av_url = s[number.upper()]
+        av_url = s[keyword.upper()]
         result = request(
             method='get',
             url=av_url,
@@ -141,7 +140,8 @@ def main(number: str) -> dict:
             "runtime": get_from_xpath(lx, '//*[@id="video_length"]/table/tr/td[2]/span/text()'),
             "series": '',
         }
-    return metadata
+
+    return Metadata(metadata)
 
 
 if __name__ == "__main__":

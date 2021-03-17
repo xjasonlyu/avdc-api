@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from lxml import etree
 
 from avdc.utility.httpclient import get_html
-from avdc.utility.metadata import toMetadata
+from avdc.utility.metadata import Metadata
 
 
 def getTitle(a: str) -> str:
@@ -129,13 +129,13 @@ def getImages(content: str) -> list[str]:  # 获取剧照
     return []
 
 
-@toMetadata
-def main(number: str) -> dict:
-    number = number.upper()
-    content = str(get_html('https://www.mgstage.com/product/product_detail/' + str(number) + '/',
-                           cookies={'adc': '1'}))
-    soup = BeautifulSoup(content, 'lxml')
+def main(keyword: str) -> Metadata:
+    keyword = keyword.upper()
 
+    url = f'https://www.mgstage.com/product/product_detail/{keyword}/'
+    text = str(get_html(url, cookies={'adc': '1'}))
+
+    soup = BeautifulSoup(text, 'lxml')
     a = str(soup.find(attrs={'class': 'detail_data'})). \
         replace('\n                                        ', ''). \
         replace('                                ', ''). \
@@ -147,8 +147,8 @@ def main(number: str) -> dict:
         replace('\n                            ', ''). \
         replace('\n                        ', '')
 
-    metadata = {
-        'title': getTitle(content).replace("\\n", '').replace('        ', ''),
+    return Metadata({
+        'title': getTitle(text).replace("\\n", '').replace('        ', ''),
         'studio': getStudio(a),
         'overview': getOverview(b),
         'runtime': getRuntime(a),
@@ -156,17 +156,16 @@ def main(number: str) -> dict:
         'stars': getStars(a),
         'release': getRelease(a),
         'id': getID(a),
-        'cover': getCover(content),
-        'small_cover': getSmallCover(content),
+        'cover': getCover(text),
+        'small_cover': getSmallCover(text),
         'tags': getTags(a),
         'label': getLabel(a),
-        'images': getImages(content),
+        'images': getImages(text),
         # 'star_photos': '',
-        'website': 'https://www.mgstage.com/product/product_detail/' + str(number) + '/',
+        'website': url,
         'source': 'mgstage',
         'series': getSeries(a),
-    }
-    return metadata
+    })
 
 
 if __name__ == '__main__':

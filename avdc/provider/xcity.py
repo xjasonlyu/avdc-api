@@ -3,7 +3,7 @@ import re
 from lxml import etree
 
 from avdc.utility.httpclient import get_html
-from avdc.utility.metadata import toMetadata
+from avdc.utility.metadata import Metadata
 
 
 def getTitle(a: str) -> str:
@@ -15,6 +15,9 @@ def getTitle(a: str) -> str:
 def getStars(a: str) -> list[str]:  # //*[@id="center_column"]/div[2]/div[1]/div/table/tbody/tr[1]/td/text()
     html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     result = html.xpath('//*[@id="avodDetails"]/div/div[3]/div[2]/div/ul[1]/li[2]/a/text()')
+    if not result:
+        result = html.xpath('//*[@id="avodDetails"]/div/div[3]/div[2]/div/ul[1]/li[3]/a/text()')
+
     return [i.strip() for i in result]
 
 
@@ -142,17 +145,17 @@ def getImages(content: str) -> list[str]:  # 获取剧照
     return []
 
 
-@toMetadata
-def main(number: str) -> dict:
-    number = number.upper()
+def main(keyword: str) -> Metadata:
+    keyword = keyword.upper()
+
     query_result = get_html(
-        'https://xcity.jp/result_published/?genre=%2Fresult_published%2F&q=' + number.
+        'https://xcity.jp/result_published/?genre=%2Fresult_published%2F&q=' + keyword.
         replace('-', '') + '&sg=main&num=30')
     html = etree.fromstring(query_result, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     urls = html.xpath("//table[contains(@class, 'resultList')]/tr[2]/td[1]/a/@href")[0]
     detail_page = get_html('https://xcity.jp' + urls)
 
-    metadata = {
+    return Metadata({
         'stars': getStars(detail_page),
         'title': getTitle(detail_page),
         'studio': getStudio(detail_page),
@@ -170,8 +173,7 @@ def main(number: str) -> dict:
         'website': 'https://xcity.jp' + urls,
         'source': 'xcity',
         'series': getSeries(detail_page),
-    }
-    return metadata
+    })
 
 
 if __name__ == '__main__':

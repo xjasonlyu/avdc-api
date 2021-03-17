@@ -3,7 +3,7 @@ import re
 from lxml import etree
 
 from avdc.utility.httpclient import get_html
-from avdc.utility.metadata import toMetadata
+from avdc.utility.metadata import Metadata
 
 
 def getTitle(a: str) -> str:
@@ -127,9 +127,9 @@ def getSmallCover(a: str, index: int = 0) -> str:
             return result
 
 
-def getImages(content: str) -> list[str]:  # 获取剧照
+def getImages(text: str) -> list[str]:  # 获取剧照
     hr = re.compile(r'<div class=\"tile-images preview-images\">[\s\S]*?</a>\s+?</div>\s+?</div>')
-    html = hr.search(content)
+    html = hr.search(text)
     if html:
         html = html.group()
         hf = re.compile(r'<a class="tile-item" href=\"(.*?)\"')
@@ -137,8 +137,8 @@ def getImages(content: str) -> list[str]:  # 获取剧照
     return []
 
 
-def getCover(content: str) -> str:
-    html = etree.fromstring(content, etree.HTMLParser())
+def getCover(text: str) -> str:
+    html = etree.fromstring(text, etree.HTMLParser())
     try:
         result = html.xpath("//div[contains(@class, 'column-video-cover')]/a/img/@src")[0]
     except:  # 2020.7.17 Repair Cover Url crawl
@@ -153,8 +153,8 @@ def getDirector(a: str) -> str:
     return str(result1 + result2).strip('+').replace("', '", '').replace('"', '')
 
 
-def getOverview(content: str) -> str:
-    html = etree.fromstring(content, etree.HTMLParser())
+def getOverview(text: str) -> str:
+    html = etree.fromstring(text, etree.HTMLParser())
     result = str(html.xpath('//*[@id="introduction"]/dd/p[1]/text()')).strip(" ['']")
     return result
 
@@ -167,17 +167,9 @@ def getSeries(a: str) -> str:
     return str(result1 + result2).strip('+').replace("', '", '').replace('"', '')
 
 
-@toMetadata
-def main(number):
-    # if re.search(r'[a-zA-Z]+\.\d{2}\.\d{2}\.\d{2}', number).group():
-    #     pass
-    # else:
-    #     number = number.upper()
-    number = number.upper()
-    try:
-        query_result = get_html('https://javdb.com/search?q=' + number + '&f=all')
-    except:
-        query_result = get_html('https://javdb4.com/search?q=' + number + '&f=all')
+def main(keyword: str) -> Metadata:
+    keyword = keyword.upper()
+    query_result = get_html('https://javdb.com/search?q=' + keyword + '&f=all')
 
     html = etree.fromstring(query_result, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     # javdb sometime returns multiple results,
@@ -185,31 +177,32 @@ def main(number):
     # iterate all candidates and find the match one
     urls = html.xpath('//*[@id="videos"]/div/div/a/@href')
     # 记录一下欧美的ids  ['Blacked','Blacked']
-    if re.search(r'[a-zA-Z]+\.\d{2}\.\d{2}\.\d{2}', number):
-        ids = [number]
+    if re.search(r'[a-zA-Z]+\.\d{2}\.\d{2}\.\d{2}', keyword):
+        ids = [keyword]
         correct_url = urls[0]
     else:
         ids = html.xpath('//*[@id="videos"]/div/div/a/div[contains(@class, "uid")]/text()')
-        correct_url = urls[ids.index(number)]
-    detail_page = get_html('https://javdb.com' + correct_url)
+        correct_url = urls[ids.index(keyword)]
+
+    detail_page = get_html('https://javdb.com' + correct_url, params={'locale': 'zh'})
 
     # no cut image by default
     # If gray image exists ,then replace with normal cover
-    if re.search(r'[a-zA-Z]+\.\d{2}\.\d{2}\.\d{2}', number):
+    if re.search(r'[a-zA-Z]+\.\d{2}\.\d{2}\.\d{2}', keyword):
         small_cover = getSmallCover(query_result)
     else:
-        small_cover = getSmallCover(query_result, index=ids.index(number))
+        small_cover = getSmallCover(query_result, index=ids.index(keyword))
     if 'placeholder' in small_cover:
         # replace wit normal cover and cut it
         small_cover = getCover(detail_page)
 
-    number = getID(detail_page)
+    vid = getID(detail_page)
     title = getTitle(detail_page)
-    if title and number:
+    if title and vid:
         # remove duplicate title
-        title = title.replace(number, '').strip()
+        title = title.replace(vid, '').strip()
 
-    metadata = {
+    return Metadata({
         'stars': getStars(detail_page),
         'title': title,
         'studio': getStudio(detail_page),
@@ -217,19 +210,17 @@ def main(number):
         'runtime': getRuntime(detail_page),
         'director': getDirector(detail_page),
         'release': getRelease(detail_page),
-        'id': number,
+        'id': vid,
         'cover': getCover(detail_page),
         'small_cover': small_cover,
         'images': getImages(detail_page),
         'tags': getTags(detail_page),
         'label': getLabel(detail_page),
-        'star_photos': getActorPhoto(detail_page),
+        # 'star_photos': getActorPhoto(detail_page),
         'website': 'https://javdb.com' + correct_url,
         'source': 'javdb',
         'series': getSeries(detail_page),
-
-    }
-    return metadata
+    })
 
 
 if __name__ == "__main__":

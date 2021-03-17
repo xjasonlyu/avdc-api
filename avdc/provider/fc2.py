@@ -3,58 +3,54 @@ import re
 from lxml import etree
 
 from avdc.utility.httpclient import get_html
-from avdc.utility.metadata import toMetadata
+from avdc.utility.metadata import Metadata
 
 
-def getTitle(content: str) -> str:
-    html = etree.fromstring(content, etree.HTMLParser())
+def getTitle(text: str) -> str:
+    html = etree.fromstring(text, etree.HTMLParser())
     result = html.xpath('/html/head/title/text()')[0]
     return result
 
 
-def getStars(content: str) -> list[str]:
-    _ = content
+def getStars(text: str) -> list[str]:
+    _ = text
     return []  # fc2 no stars
 
 
-def getStudio(content: str) -> str:  # 获取厂商
-    try:
-        html = etree.fromstring(content, etree.HTMLParser())
-        result = str(html.xpath('//*[@id="top"]/div[1]/section[1]/div/section/div[2]/ul/li[3]/a/text()')).strip(" ['']")
-        return result
-    except:
-        return ''
+def getStudio(text: str) -> str:  # 获取厂商
+    html = etree.fromstring(text, etree.HTMLParser())
+    return str(html.xpath('//*[@id="top"]/div[1]/section[1]/div/section/div[2]/ul/li[3]/a/text()')).strip(" ['']")
 
 
-def getID(content: str) -> str:  # 获取番号
-    html = etree.fromstring(content, etree.HTMLParser())
+def getID(text: str) -> str:  # 获取番号
+    html = etree.fromstring(text, etree.HTMLParser())
     result = str(html.xpath('/html/body/div[5]/div[1]/div[2]/p[1]/span[2]/text()')).strip(" ['']")
     return result
 
 
-def getRelease(content: str) -> str:
-    html = etree.fromstring(content, etree.HTMLParser())
+def getRelease(text: str) -> str:
+    html = etree.fromstring(text, etree.HTMLParser())
     result = str(html.xpath('//*[@id="top"]/div[1]/section[1]/div/section/div[2]/div[2]/p/text()')).strip(
-        " ['販売日 : ']").replace('/', '-')
+        " ['Sale Day : 販売日 : ']").replace('/', '-')
     return result
 
 
-def getCover(content: str) -> str:
-    html = etree.fromstring(content, etree.HTMLParser())
+def getCover(text: str) -> str:
+    html = etree.fromstring(text, etree.HTMLParser())
     result = str(html.xpath('//*[@id="top"]/div[1]/section[1]/div/section/div[1]/span/img/@src')).strip(" ['']")
     return 'http:' + result
 
 
 def getTags(number: str) -> list[str]:
-    content = str(bytes(get_html('http://adult.contents.fc2.com/api/v4/article/' + number + '/tag?'), 'utf-8').decode(
+    text = str(bytes(get_html('http://adult.contents.fc2.com/api/v4/article/' + number + '/tag?'), 'utf-8').decode(
         'unicode-escape'))
-    result = re.findall('"tag":"(.*?)"', content)
+    result = re.findall('"tag":"(.*?)"', text)
     return result
 
 
-def getImages(content: str) -> list[str]:  # 获取剧照
+def getImages(text: str) -> list[str]:  # 获取剧照
     hr = re.compile(r'<ul class=\"items_article_SampleImagesArea\"[\s\S]*?</ul>')
-    html = hr.search(content)
+    html = hr.search(text)
     if html:
         html = html.group()
         hf = re.compile(r'<a href=\"(.*?)\"')
@@ -62,32 +58,34 @@ def getImages(content: str) -> list[str]:  # 获取剧照
     return []
 
 
-@toMetadata
-def main(number: str) -> dict:
-    number = number.upper().replace('FC2-', '').replace('FC2PPV-', '')
-    content = get_html('https://adult.contents.fc2.com/article/' + number + '/')
+def main(keyword: str) -> Metadata:
+    keyword = keyword.upper().replace('FC2-', '').replace('FC2PPV-', '')
 
-    metadata = {
-        'title': getTitle(content),
-        'studio': getStudio(content),
-        'overview': '',  # getOverview(content),
+    url = f'https://adult.contents.fc2.com/article/{keyword}/'
+    text = get_html(url)
+
+    if 'The product you were looking for was not found.' in text:
+        raise ValueError(f'fc2: {keyword} not found')
+
+    return Metadata({
+        'title': getTitle(text),
+        'studio': getStudio(text),
+        'overview': '',  # getOverview(text),
         'runtime': '',
-        'director': getStudio(content),
-        'stars': getStars(content),
-        'release': getRelease(content),
-        'id': 'FC2-' + number,
+        'director': getStudio(text),
+        'stars': getStars(text),
+        'release': getRelease(text),
+        'id': 'FC2-' + keyword,
         'label': '',
-        'cover': getCover(content),
-        'images': getImages(content),
-        'tags': getTags(number),
-        # 'star_photos': '',
-        'website': 'https://adult.contents.fc2.com/article/' + number + '/',
+        'cover': getCover(text),
+        'images': getImages(text),
+        'tags': getTags(keyword),
+        'website': url,
         'source': 'fc2',
         'series': '',
-    }
-    return metadata
+    })
 
 
 if __name__ == '__main__':
     # print(main('FC2-1603395'))
-    print(main('FC2PPV-937451'))
+    print(main('FC2PPV-1603395'))

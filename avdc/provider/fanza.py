@@ -2,16 +2,16 @@ import re
 from urllib.parse import urlencode
 
 from lxml import etree
-from requests import HTTPError
 
 from avdc.utility.httpclient import get_html
-from avdc.utility.metadata import toMetadata
+from avdc.utility.metadata import Metadata
+from avdc.utility.misc import extractTitle
 
 
 def getTitle(text: str) -> str:
     html = etree.fromstring(text, etree.HTMLParser())
-    result = html.xpath('//*[starts-with(@id, "title")]/text()')[0]
-    return result
+    title = html.xpath('//*[starts-with(@id, "title")]/text()')[0]
+    return extractTitle(title)
 
 
 def getStars(text: str) -> str:
@@ -33,7 +33,7 @@ def getStudio(text: str) -> str:
         result = html.xpath(
             "//td[contains(text(),'メーカー')]/following-sibling::td/a/text()"
         )[0]
-    except:
+    except IndexError:
         result = html.xpath(
             "//td[contains(text(),'メーカー')]/following-sibling::td/text()"
         )[0]
@@ -192,11 +192,10 @@ def getImages(content: str) -> list[str]:  # 获取剧照
     return []
 
 
-@toMetadata
-def main(number: str) -> dict:
+def main(keyword: str) -> Metadata:
     # fanza allow letter + number + underscore, normalize the input here
     # @note: I only find the usage of underscore as h_test123456789
-    fanza_search_number = number
+    fanza_search_number = keyword
     # AV_Data_Capture.py.getIDber() over format the input, restore the h_ prefix
     if fanza_search_number.startswith("h-"):
         fanza_search_number = fanza_search_number.replace("h-", "h_")
@@ -214,52 +213,45 @@ def main(number: str) -> dict:
     ]
     chosen_url = ""
 
-    content = None
+    text = ''
     for url in fanza_urls:
         chosen_url = url + fanza_search_number
-        try:
-            content = get_html(
-                "https://www.dmm.co.jp/age_check/=/declared=yes/?{}".format(
-                    urlencode({"rurl": chosen_url})
-                )
-            )
-        except HTTPError:
-            continue
-        else:
+        text = get_html(
+            "https://www.dmm.co.jp/age_check/=/declared=yes/?{}".format(
+                urlencode({"rurl": chosen_url})
+            ),
+            # raise_for_status=True,
+        )
+        if "404 Not Found" not in text:
             break
-
-    if content is None:
-        return {}
 
     # for some old page, the input number does not match the page
     # for example, the url will be cid=test012
     # but the hinban on the page is test00012
     # so get the hinban first, and then pass it to following functions
-    fanza_hinban = getID(content)
-    metadata = {
-        "title": getTitle(content).strip(),
-        "studio": getStudio(content),
-        "overview": getOverview(content),
-        "runtime": getRuntime(content),
-        "director": getDirector(content) if "anime" not in chosen_url else "",
-        "stars": getStars(content) if "anime" not in chosen_url else "",
-        "release": getRelease(content),
-        "id": fanza_hinban,
-        "cover": getCover(content, fanza_hinban),
-        "tags": getTags(content),
-        "images": getImages(content),
-        "label": getLabel(content),
-        # "star_photos": "",
-        "website": chosen_url,
-        "source": "fanza",
-        "series": getSeries(content),
-    }
-    print(metadata)
-    return metadata
+    fanza_hinban = getID(text)
+
+    return Metadata({
+        'title': getTitle(text).strip(),
+        'studio': getStudio(text),
+        'overview': getOverview(text),
+        'runtime': getRuntime(text),
+        'director': getDirector(text) if 'anime' not in chosen_url else '',
+        'stars': getStars(text) if 'anime' not in chosen_url else '',
+        'release': getRelease(text),
+        'id': fanza_hinban,
+        'cover': getCover(text, fanza_hinban),
+        'tags': getTags(text),
+        'images': getImages(text),
+        'label': getLabel(text),
+        'website': chosen_url,
+        'source': 'fanza',
+        'series': getSeries(text),
+    })
 
 
-if __name__ == "__main__":
-    # print(main("DV-1562"))
-    # print(main("96fad1217"))
-    # print(main("pred00251"))
-    print(main("118ABP115"))
+if __name__ == '__main__':
+    # print(main('DV-1562'))
+    # print(main('96fad1217'))
+    # print(main('pred00251'))
+    print(main('118ABP115'))
