@@ -92,12 +92,14 @@ def main(keyword: str) -> Metadata:
     def search_url(v):
         x = get_html(avsox_site + '/cn/search/' + v)
         tree = etree.fromstring(x, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-        return str(tree.xpath('//*[@id="waterfall"]/div/a/@href')).strip(" ['']"), x
+        for r in tree.xpath('//*[@id="waterfall"]/div/a/@href'):
+            return str(r), x
+        return None, x
 
     url, search_page = search_url(keyword)
 
-    if url.count('https://') > 2:
-        raise NotFound(f'javsox: {keyword} not found')
+    if not url or url.count('https://') > 1:
+        raise NotFound(f'avsox: {keyword} not found')
 
     text = get_html(url, raise_for_status=True)
     soup = BeautifulSoup(text, 'lxml')
@@ -124,4 +126,4 @@ def main(keyword: str) -> Metadata:
 
 if __name__ == "__main__":
     # print(main('012717_472'))
-    print(main('090520-001'))
+    print(main('092719-001'))
