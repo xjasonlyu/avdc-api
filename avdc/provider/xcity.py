@@ -53,7 +53,7 @@ def getLabel(a: str) -> str:
         return ''
 
 
-def getID(a: str) -> str:
+def getVID(a: str) -> str:
     html = etree.fromstring(a, etree.HTMLParser())
     try:
         result = html.xpath('//*[@id="hinban"]/text()')[0]
@@ -163,7 +163,7 @@ def main(keyword: str) -> Metadata:
         'runtime': getRuntime(detail_page),
         'director': getDirector(detail_page),
         'release': getRelease(detail_page),
-        'id': getID(detail_page),
+        'vid': getVID(detail_page),
         'cover': getCover(detail_page),
         'small_cover': '',
         'images': getImages(detail_page),

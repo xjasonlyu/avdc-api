@@ -75,7 +75,7 @@ def getLabel(a: str) -> str:
     return str(result1 + result2).strip('+').replace("', '", '').replace('"', '')
 
 
-def getID(a: str) -> str:
+def getVID(a: str) -> str:
     html = etree.fromstring(a, etree.HTMLParser())
     result1 = str(html.xpath('//strong[contains(text(),"番號")]/../span/text()')).strip(" ['']")
     result2 = str(html.xpath('//strong[contains(text(),"番號")]/../span/a/text()')).strip(" ['']")
@@ -196,7 +196,7 @@ def main(keyword: str) -> Metadata:
         # replace wit normal cover and cut it
         small_cover = getCover(detail_page)
 
-    vid = getID(detail_page)
+    vid = getVID(detail_page)
     title = getTitle(detail_page)
     if title and vid:
         # remove duplicate title
@@ -210,7 +210,7 @@ def main(keyword: str) -> Metadata:
         'runtime': getRuntime(detail_page),
         'director': getDirector(detail_page),
         'release': getRelease(detail_page),
-        'id': vid,
+        'vid': vid,
         'cover': getCover(detail_page),
         'small_cover': small_cover,
         'images': getImages(detail_page),

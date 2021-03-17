@@ -52,7 +52,7 @@ def getLabel(a: str) -> str:
     return str(result1 + result2).strip('+').replace("', '", '').replace('"', '').strip()
 
 
-def getID(a: str) -> str:
+def getVID(a: str) -> str:
     html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     result1 = str(html.xpath('//th[contains(text(),"品番：")]/../td/a/text()')).strip(" ['']").strip('\\n    ').strip(
         '\\n')
@@ -141,7 +141,7 @@ def main(keyword: str) -> Metadata:
         replace('                                ', ''). \
         replace('\n                            ', ''). \
         replace('\n                        ', '')
-    b = str(soup.find(attrs={'id': 'introduction'})). \
+    b = str(soup.find(attrs={"id": "introduction"})). \
         replace('\n                                        ', ''). \
         replace('                                ', ''). \
         replace('\n                            ', ''). \
@@ -155,7 +155,7 @@ def main(keyword: str) -> Metadata:
         # 'director': getDirector(a),
         'stars': getStars(a),
         'release': getRelease(a),
-        'id': getID(a),
+        'vid': getVID(a),
         'cover': getCover(text),
         'small_cover': getSmallCover(text),
         'tags': getTags(a),

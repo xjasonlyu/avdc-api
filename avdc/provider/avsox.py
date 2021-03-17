@@ -41,7 +41,7 @@ def getLabel(content: str) -> str:
     return result
 
 
-def getID(content: str) -> str:
+def getVID(content: str) -> str:
     tree = etree.fromstring(content, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     result = str(tree.xpath('//span[contains(text(),"识别码:")]/../span[2]/text()')).strip(" ['']")
     return result
@@ -107,7 +107,7 @@ def main(keyword: str) -> Metadata:
         'runtime': getRuntime(info),
         'director': '',  #
         'release': getRelease(info),
-        'id': getID(info),
+        'vid': getVID(info),
         'cover': getCover(text),
         'small_cover': getSmallCover(search_page),
         'tags': getTags(text),

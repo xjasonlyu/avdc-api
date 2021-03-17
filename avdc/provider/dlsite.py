@@ -140,7 +140,7 @@ def main(keyword: str) -> Metadata:
         'runtime': '',
         'director': getDirector(text),
         'release': getRelease(text),
-        'id': keyword,
+        'vid': keyword,
         'cover': 'https:' + getCover(text),
         # 'small_cover': '',
         'tags': getTags(text),

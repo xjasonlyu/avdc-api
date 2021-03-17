@@ -59,7 +59,7 @@ def getLabel(text: str) -> str:
     return result
 
 
-def getID(text: str) -> str:
+def getVID(text: str) -> str:
     html = etree.fromstring(text, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     try:
         result = html.xpath(
@@ -196,7 +196,7 @@ def main(keyword: str) -> Metadata:
     # fanza allow letter + number + underscore, normalize the input here
     # @note: I only find the usage of underscore as h_test123456789
     fanza_search_number = keyword
-    # AV_Data_Capture.py.getIDber() over format the input, restore the h_ prefix
+    # AV_Data_Capture.py.getVIDber() over format the input, restore the h_ prefix
     if fanza_search_number.startswith("h-"):
         fanza_search_number = fanza_search_number.replace("h-", "h_")
 
@@ -229,7 +229,7 @@ def main(keyword: str) -> Metadata:
     # for example, the url will be cid=test012
     # but the hinban on the page is test00012
     # so get the hinban first, and then pass it to following functions
-    fanza_hinban = getID(text)
+    fanza_hinban = getVID(text)
 
     return Metadata({
         'title': getTitle(text).strip(),
@@ -239,7 +239,7 @@ def main(keyword: str) -> Metadata:
         'director': getDirector(text) if 'anime' not in chosen_url else '',
         'stars': getStars(text) if 'anime' not in chosen_url else '',
         'release': getRelease(text),
-        'id': fanza_hinban,
+        'vid': fanza_hinban,
         'cover': getCover(text, fanza_hinban),
         'tags': getTags(text),
         'images': getImages(text),

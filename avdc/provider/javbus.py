@@ -30,7 +30,7 @@ def _getAttribute(text: str, attr: str, sub_expr: str) -> str:
     return ''
 
 
-def getID(text: str) -> str:  # 获取番号
+def getVID(text: str) -> str:  # 获取番号
     return _getAttribute(text, '識別碼', './span[2]/text()').upper()
 
 
@@ -126,7 +126,7 @@ def main(keyword: str) -> Metadata:
         'director': getDirector(text),
         'stars': getStars(text),
         'release': getRelease(text),
-        'id': getID(text),
+        'vid': getVID(text),
         'cover': getCover(text),
         'tags': getTags(text),
         'images': getImages(text),

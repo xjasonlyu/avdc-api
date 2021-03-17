@@ -82,7 +82,7 @@ def getStudio(data: hash) -> str:
         return ""
 
 
-def getID(data: hash) -> str:
+def getVID(data: hash) -> str:
     if "品番" in data:
         return get_text_info(data["品番"])
     else:
@@ -135,7 +135,7 @@ def parse_info(soup: BeautifulSoup) -> dict:
             'label': getLabel(data_dic),
             'studio': getStudio(data_dic),
             'tags': getTags(data_dic),
-            'id': getID(data_dic),
+            'vid': getVID(data_dic),
             'release': getRelease(data_dic),
             'runtime': getRuntime(data_dic),
             'series': getSeries(data_dic),

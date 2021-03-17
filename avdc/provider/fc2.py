@@ -22,7 +22,7 @@ def getStudio(text: str) -> str:  # 获取厂商
     return str(html.xpath('//*[@id="top"]/div[1]/section[1]/div/section/div[2]/ul/li[3]/a/text()')).strip(" ['']")
 
 
-def getID(text: str) -> str:  # 获取番号
+def getVID(text: str) -> str:  # 获取番号
     html = etree.fromstring(text, etree.HTMLParser())
     result = str(html.xpath('/html/body/div[5]/div[1]/div[2]/p[1]/span[2]/text()')).strip(" ['']")
     return result
@@ -75,7 +75,7 @@ def main(keyword: str) -> Metadata:
         'director': getStudio(text),
         'stars': getStars(text),
         'release': getRelease(text),
-        'id': 'FC2-' + keyword,
+        'vid': 'FC2-' + keyword,
         'label': '',
         'cover': getCover(text),
         'images': getImages(text),
