@@ -30,7 +30,7 @@ class BasicModel(Model):
 
 
 class Metadata(BasicModel):
-    id = CharField(primary_key=True, unique=True)
+    vid = CharField(primary_key=True, unique=True)
     title = TextField()
 
     # info fields
@@ -68,7 +68,7 @@ class People(BasicModel):
 
 
 class Cover(BasicModel):
-    id = CharField(primary_key=True, unique=True)
+    vid = CharField(primary_key=True, unique=True)
     format = CharField()
     data = BlobField()
 

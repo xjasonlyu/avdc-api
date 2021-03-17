@@ -3,7 +3,6 @@ from functools import wraps
 from typing import Any, Callable, Optional
 
 from avdc.people import gfriends
-from avdc.provider import airav
 from avdc.provider import avsox
 from avdc.provider import dlsite
 from avdc.provider import fanza
@@ -19,22 +18,21 @@ from avdc.utility.image import (autoCropImage,
                                 getRawImageFormat,
                                 imageToBytes,
                                 bytesToImage)
-from avdc.utility.metadata import Metadata, joinMetadataCall
-from avdc.utility.misc import parseVID
+from avdc.utility.metadata import Metadata
+from avdc.utility.misc import parseVID, concurrentMap
 from server import app
 from server import db_operator
 
 
-def extract_id(fn: Callable[[str, bool], Any]):
+def extract_vid(fn: Callable[[str, bool], Any]):
     @wraps(fn)
-    def wrapper(_id: str):
-        return fn(*parseVID(_id))
+    def wrapper(vid: str):
+        return fn(*parseVID(vid))
 
     return wrapper
 
 
 _functions = {
-    'airav': airav.main,
     'avsox': avsox.main,
     'fanza': fanza.main,
     'fc2': fc2.main,
@@ -47,7 +45,7 @@ _functions = {
     'dlsite': dlsite.main,
 }
 
-_priority = 'javbus+jav321,mgstage,avsox,javdb,fanza,xcity,javlib,fc2'
+_priority = 'javbus+jav321,mgstage,avsox,javdb,javlib,fanza,xcity,fc2'
 
 
 def _getSources(keyword: str) -> list[str]:
@@ -70,37 +68,46 @@ def _getSources(keyword: str) -> list[str]:
     return sources
 
 
-def _getRemoteMetadata(_id: str) -> Optional[Metadata]:
-    for m in _getSources(_id):
+def _getRemoteMetadata(vid: str) -> Optional[Metadata]:
+    for m in _getSources(vid):
         if not m.strip():
             continue
         try:
-            return joinMetadataCall(*[_functions[i.strip()] for i in m.split('+')])(_id)
+            results = concurrentMap(lambda n: _functions[n](vid),
+                                    m.split('+'), max_workers=len(m.split('+')))
+
+            if len(results) < 2:
+                return results[0]
+
+            m = results[0]
+            for result in results[1:]:
+                m += result
+            return m
         except Exception as e:
-            app.logger.warning(f'match metadata from {m}: {_id}: {e}')
+            app.logger.warning(f'match metadata from {m}: {vid}: {e}')
             continue
     return
 
 
-def _getLocalMetadata(_id: str) -> Optional[Metadata]:
-    return db_operator.GetMetadataByID(_id)
+def _getLocalMetadata(vid: str) -> Optional[Metadata]:
+    return db_operator.GetMetadataByVID(vid)
 
 
-def GetMetadataByID(_id: str) -> Optional[Metadata]:
+def GetMetadataByVID(vid: str) -> Optional[Metadata]:
     def valid(_m: Any) -> bool:
         return _m is not None and isinstance(_m, Metadata)
 
-    m = _getLocalMetadata(_id)
+    m = _getLocalMetadata(vid)
     if valid(m):
         return m
 
-    m = _getRemoteMetadata(_id)
+    m = _getRemoteMetadata(vid)
     if not valid(m):
         return
 
     # store to database
     db_operator.StoreMetadata(m)
-    app.logger.info(f'store {m.id} to database')
+    app.logger.info(f'store {m.vid} to database')
     return m
 
 
@@ -119,12 +126,12 @@ def GetPeopleByName(name: str) -> Optional[list[str]]:
     return images
 
 
-def _getCoverImageByID(_id: str) -> Optional[tuple[str, bytes]]:
-    result = db_operator.GetCoverByID(_id)
+def _getCoverImageByVID(vid: str) -> Optional[tuple[str, bytes]]:
+    result = db_operator.GetCoverByVID(vid)
     if result:
         return result  # format, data
 
-    m = GetMetadataByID(_id)
+    m = GetMetadataByVID(vid)
     if not m:
         return
 
@@ -132,16 +139,16 @@ def _getCoverImageByID(_id: str) -> Optional[tuple[str, bytes]]:
     fmt = getRawImageFormat(data)
     assert fmt is not None
 
-    db_operator.StoreCover(m.id, data, fmt)
+    db_operator.StoreCover(m.vid, data, fmt)
     return fmt, data
 
 
-def GetBackdropImageByID(_id: str) -> Optional[tuple[str, bytes]]:
-    return _getCoverImageByID(_id)
+def GetBackdropImageByVID(vid: str) -> Optional[tuple[str, bytes]]:
+    return _getCoverImageByVID(vid)
 
 
-def GetPrimaryImageByID(_id: str) -> Optional[bytes]:
-    result = _getCoverImageByID(_id)
+def GetPrimaryImageByVID(vid: str) -> Optional[bytes]:
+    result = _getCoverImageByVID(vid)
     if not result:
         return
 
@@ -150,11 +157,11 @@ def GetPrimaryImageByID(_id: str) -> Optional[bytes]:
 
 
 if __name__ == '__main__':
-    from server.database import sqlite_db_init
-
-    sqlite_db_init('../avdc.db')
-
-    print(GetMetadataByID('abp-233'))
+    # from server.database import sqlite_db_init
+    #
+    # sqlite_db_init('../avdc.db')
+    #
+    # print(GetMetadataByVID('abp-233'))
     # print(GetPeopleByName('通野未帆'))
-    # m = _getRemoteMetadata('abp-999')
+    print(_getRemoteMetadata('drm-003'))
     # models.UpdateMetadata(m)

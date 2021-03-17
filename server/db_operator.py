@@ -8,12 +8,12 @@ from avdc.utility.metadata import Metadata as _M
 from server.database import Metadata, People, Cover
 
 
-def GetMetadataByID(_id: str) -> Optional[_M]:
-    _id = _id.upper()
+def GetMetadataByVID(vid: str) -> Optional[_M]:
+    vid = vid.upper()
     try:
-        result: Metadata = Metadata.get((Metadata.id == _id) |
-                                        (Metadata.id == _id.replace('-', '_')) |
-                                        (Metadata.id == _id.replace('_', '-')))
+        result: Metadata = Metadata.get((Metadata.vid == vid) |
+                                        (Metadata.vid == vid.replace('-', '_')) |
+                                        (Metadata.vid == vid.replace('_', '-')))
     except DoesNotExist:
         return
     return _M(result.__data__)
@@ -25,7 +25,7 @@ def UpdateMetadata(metadata: _M):
 
     (Metadata
      .update(m)
-     .where(Metadata.id == metadata.id)
+     .where(Metadata.vid == metadata.vid)
      .execute())
 
 
@@ -51,20 +51,20 @@ def StorePeople(name: str, images: list[str]):
      .execute())
 
 
-def GetCoverByID(_id: str) -> Optional[tuple[str, bytes]]:
-    _id = _id.upper()
+def GetCoverByVID(vid: str) -> Optional[tuple[str, bytes]]:
+    vid = vid.upper()
     try:
-        result: Cover = Cover.get((Cover.id == _id) |
-                                  (Cover.id == _id.replace('-', '_')) |
-                                  (Cover.id == _id.replace('_', '-')))
+        result: Cover = Cover.get((Cover.vid == vid) |
+                                  (Cover.vid == vid.replace('-', '_')) |
+                                  (Cover.vid == vid.replace('_', '-')))
     except DoesNotExist:
         return
     return result.format, result.data
 
 
-def StoreCover(_id: str, data: bytes, fmt: Optional[str] = None):
+def StoreCover(vid: str, data: bytes, fmt: Optional[str] = None):
     (Cover
-     .insert(id=_id,
+     .insert(vid=vid,
              data=data,
              format=fmt or getRawImageFormat(data))
      .on_conflict_ignore()

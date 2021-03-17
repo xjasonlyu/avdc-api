@@ -15,11 +15,11 @@ class Metadata:
         self._raw: dict[str, Any] = raw
 
         # required fields
-        self.id: str = self._get('id', '').strip().upper()
+        self.vid: str = self._get('vid', '').strip().upper()
         self.title: str = self._get('title', '')
 
-        if not self.id:
-            raise MetadataError('metadata missing id')
+        if not self.vid:
+            raise MetadataError('metadata missing vid')
         if not self.title:
             raise MetadataError('metadata missing title')
 
@@ -101,10 +101,10 @@ class Metadata:
 
 
 def test():
-    m1 = Metadata({'id': '0', 'title': 't', 'cover': 'n', 'source': 'ss'})
-    m2 = Metadata({'id': '0', 'title': 't', 'cover': 'n', 'source': 'ss'})
-    m3 = Metadata({'id': '1', 'title': 't', 'cover': 'm', 'source': 'ss'})
-    m4 = Metadata({'id': '0', 'title': 'tt', 'source': 'test', 'website': 'http'})
+    m1 = Metadata({'vid': '0', 'title': 't', 'cover': 'n', 'source': 'ss'})
+    m2 = Metadata({'vid': '0', 'title': 't', 'cover': 'n', 'source': 'ss'})
+    m3 = Metadata({'vid': '1', 'title': 't', 'cover': 'm', 'source': 'ss'})
+    m4 = Metadata({'vid': '0', 'title': 'tt', 'source': 'test', 'website': 'http'})
 
     assert m1 == m1 == m2
     assert m1 != m3 and m2 != m3
