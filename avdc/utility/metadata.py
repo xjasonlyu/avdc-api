@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Iterable
 from typing import Any, Union
 
 
@@ -72,7 +73,7 @@ class Metadata:
     def _to_list(v: Union[str, list[str]]) -> list[str]:
         if isinstance(v, str):
             return [v]
-        elif isinstance(v, list):
+        elif isinstance(v, Iterable):
             return [i for i in v]
         else:
             return []
