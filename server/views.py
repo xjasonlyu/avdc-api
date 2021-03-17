@@ -2,6 +2,7 @@ from http import HTTPStatus
 
 from flask import Response
 from flask import jsonify
+from flask import request
 from werkzeug.exceptions import HTTPException
 
 from avdc.utility import image
@@ -68,7 +69,10 @@ def _people_image(name: str, index: int = 0):
 @app.route('/metadata/<vid>')
 @api.extract_vid
 def _metadata(vid: str, c: bool):
-    m = api.GetMetadataByVID(vid)
+    update = api.str_to_bool(
+        request.args.get('update'))
+
+    m = api.GetMetadataByVID(vid, update=update)
     if not m:
         return jsonify(status=False,
                        message=f'metadata not found: {vid}'), HTTPStatus.NOT_FOUND

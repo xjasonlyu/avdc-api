@@ -1,3 +1,4 @@
+import json
 import re
 from functools import wraps
 from typing import Any, Callable, Optional
@@ -30,6 +31,13 @@ def extract_vid(fn: Callable[[str, bool], Any]):
         return fn(*parseVID(vid))
 
     return wrapper
+
+
+def str_to_bool(s: str) -> bool:
+    try:
+        return True if json.loads(s) else False
+    except json.decoder.JSONDecodeError:
+        return False
 
 
 _functions = {
@@ -164,7 +172,13 @@ if __name__ == '__main__':
     #
     # sqlite_db_init('../avdc.db')
     #
-    print(GetMetadataByVID('abp-233', update=True))
+    # print(GetMetadataByVID('abp-233', update=True))
     # print(GetPeopleByName('通野未帆'))
     # print(_getRemoteMetadata('drm-003'))
     # models.UpdateMetadata(m)
+
+    print(str_to_bool('true'))
+    print(str_to_bool('True'))
+    print(str_to_bool('1'))
+    print(str_to_bool('0'))
+    print(str_to_bool('idk'))
