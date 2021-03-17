@@ -33,6 +33,10 @@ def extract_vid(fn: Callable[[str, bool], Any]):
     return wrapper
 
 
+def is_valid_metadata(_m: Any) -> bool:
+    return isinstance(_m, Metadata)
+
+
 def str_to_bool(s: str) -> bool:
     try:
         return True if json.loads(s) else False
@@ -53,48 +57,53 @@ _functions = {
     'dlsite': dlsite.main,
 }
 
-_priority = 'javbus+jav321,mgstage,avsox,javdb'
+_priority = 'javbus+jav321,mgstage,avsox,javdb,fanza,xcity,javlib,fc2'
 
 
 def _getSources(keyword: str) -> list[str]:
     sources = _priority.split(',')  # default priority
 
-    if "avsox" in sources and (re.match(r"^\d{5,}", keyword) or
-                               "HEYZO" in keyword.upper()):
-        sources.insert(0, sources.pop(sources.index("avsox")))
+    # if "avsox" in sources and (re.match(r"^\d{5,}", keyword) or
+    #                            "HEYZO" in keyword.upper() or "BD" in keyword.upper()):
+    #     sources.insert(0, sources.pop(sources.index("avsox")))
 
-    elif "mgstage" in sources and (re.match(r"\d+\D+", keyword) or
-                                   "SIRO" in keyword.upper()):
+    if "mgstage" in sources and (re.match(r"\d+[a-zA-Z]+", keyword) or
+                                 "SIRO" in keyword.upper()):
         sources.insert(0, sources.pop(sources.index("mgstage")))
 
-    elif "fc2" in sources and "FC2" in keyword.upper():
+    if "fc2" in sources and "FC2" in keyword.upper():
         sources.insert(0, sources.pop(sources.index("fc2")))
 
-    elif "dlsite" in sources and "RJ" in keyword.upper():
+    if "dlsite" in sources and "RJ" in keyword.upper():
         sources.insert(0, sources.pop(sources.index("dlsite")))
 
     return sources
 
 
 def _getRemoteMetadata(vid: str) -> Optional[Metadata]:
+    def no_exception_call(source: str) -> Optional[Metadata]:
+        try:
+            return _functions[source](vid)
+        except Exception as e:
+            app.logger.warning(f'match metadata from {source}: {vid}: {e}')
+            return
+
     for m in _getSources(vid):
         if not m.strip():
             continue
-        try:
-            results = concurrentMap(lambda n: _functions[n](vid),
-                                    m.split('+'), max_workers=len(m.split('+')))
 
-            if len(results) < 2:
-                return results[0]
+        results = [r for r in concurrentMap(no_exception_call,
+                                            m.split('+'),
+                                            max_workers=len(m.split('+')))
+                   if is_valid_metadata(r)]
 
-            m = results[0]
-            for result in results[1:]:
-                m += result
-            return m
-        except Exception as e:
-            app.logger.warning(f'match metadata from {m}: {vid}: {e}')
+        if not results:
             continue
-    return
+
+        m = results[0]
+        for result in results[1:]:
+            m += result
+        return m
 
 
 def _getLocalMetadata(vid: str) -> Optional[Metadata]:
@@ -102,16 +111,13 @@ def _getLocalMetadata(vid: str) -> Optional[Metadata]:
 
 
 def GetMetadataByVID(vid: str, update: bool = False) -> Optional[Metadata]:
-    def valid(_m: Any) -> bool:
-        return isinstance(_m, Metadata)
-
     if not update:  # try from database
         m = _getLocalMetadata(vid)
-        if valid(m):
+        if is_valid_metadata(m):
             return m
 
     m = _getRemoteMetadata(vid)
-    if not valid(m):
+    if not is_valid_metadata(m):
         return
 
     # store to database
@@ -174,11 +180,11 @@ if __name__ == '__main__':
     #
     # print(GetMetadataByVID('abp-233', update=True))
     # print(GetPeopleByName('通野未帆'))
-    # print(_getRemoteMetadata('drm-003'))
+    print(_getRemoteMetadata('100518-766'))
     # models.UpdateMetadata(m)
 
-    print(str_to_bool('true'))
-    print(str_to_bool('True'))
-    print(str_to_bool('1'))
-    print(str_to_bool('0'))
-    print(str_to_bool('idk'))
+    # print(str_to_bool('true'))
+    # print(str_to_bool('True'))
+    # print(str_to_bool('1'))
+    # print(str_to_bool('0'))
+    # print(str_to_bool('idk'))
