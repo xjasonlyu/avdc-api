@@ -77,35 +77,35 @@ def main(keyword: str) -> Metadata:
     # Scraping
     result = request(
         method='get',
-        url="http://www.javlibrary.com/cn/vl_searchbyid.php?keyword={}".format(keyword),
+        url='http://www.javlibrary.com/cn/vl_searchbyid.php?keyword={}'.format(keyword),
         cookies=cookies,
         user_agent=user_agent,
     )
-    soup = BeautifulSoup(result.text, "html.parser")
+    soup = BeautifulSoup(result.text, 'html.parser')
     lx = html.fromstring(str(soup))
 
     fanhao_pather = re.compile(r'<a href=".*?".*?><div class="id">(.*?)</div>')
     fanhao = fanhao_pather.findall(result.text)
 
     metadata = {}
-    if "/?v=jav" in result.url:
+    if '/?v=jav' in result.url:
         metadata = {
-            "title": get_title(lx, soup),
-            "studio": get_table_el_single_anchor(soup, "video_maker"),
-            # "year": get_table_el_td(soup, "video_date")[:4],
-            "overview": "",
-            "director": get_table_el_single_anchor(soup, "video_director"),
-            "cover": getCover(lx),
-            "star_photos": "",
-            "website": result.url,
-            "source": "javlib",
-            "stars": get_table_el_multi_anchor(soup, "video_cast").split(","),
-            "label": get_table_el_td(soup, "video_label"),
-            "tags": get_table_el_multi_anchor(soup, "video_genres").split(","),
-            "id": get_table_el_td(soup, "video_id"),
-            "release": get_table_el_td(soup, "video_date"),
-            "runtime": get_from_xpath(lx, '//*[@id="video_length"]/table/tr/td[2]/span/text()'),
-            "series": '',
+            'title': get_title(lx, soup),
+            'studio': get_table_el_single_anchor(soup, 'video_maker'),
+            # 'year': get_table_el_td(soup, 'video_date')[:4],
+            'overview': '',
+            'director': get_table_el_single_anchor(soup, 'video_director'),
+            'cover': getCover(lx),
+            'star_photos': '',
+            'website': result.url,
+            'source': 'javlib',
+            'stars': get_table_el_multi_anchor(soup, 'video_cast').split(','),
+            'label': get_table_el_td(soup, 'video_label'),
+            'tags': get_table_el_multi_anchor(soup, 'video_genres').split(','),
+            'id': get_table_el_td(soup, 'video_id'),
+            'release': get_table_el_td(soup, 'video_date'),
+            'runtime': get_from_xpath(lx, '//*[@id="video_length"]/table/tr/td[2]/span/text()'),
+            'series': '',
         }
     elif keyword.upper() in fanhao:
         url_pather = re.compile(r'<a href="(.*?)".*?><div class="id">(.*?)</div>')
@@ -119,7 +119,7 @@ def main(keyword: str) -> Metadata:
             url=av_url,
             cookies=cookies,
         )
-        soup = BeautifulSoup(result.text, "html.parser")
+        soup = BeautifulSoup(result.text, 'html.parser')
         lx = html.fromstring(str(soup))
 
         metadata = {
