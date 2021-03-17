@@ -133,7 +133,7 @@ def getImages(text: str) -> list[str]:  # 获取剧照
     if html:
         html = html.group()
         hf = re.compile(r'<a class="tile-item" href=\"(.*?)\"')
-        return hf.findall(html)
+        return [i.strip() for i in hf.findall(html) if i.startswith('http')]
     return []
 
 
@@ -229,4 +229,4 @@ if __name__ == "__main__":
     # print(main('BANK-022'))
     # print(main('MIAE-003'))
     # print(main('ABW-065'))
-    print(main('IPX-565'))
+    print(main('mide-460'))
