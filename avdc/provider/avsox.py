@@ -113,7 +113,7 @@ def main(keyword: str) -> Metadata:
         'release': getRelease(info),
         'vid': getVID(info),
         'cover': getCover(text),
-        'small_cover': getSmallCover(search_page),
+        # 'small_cover': getSmallCover(search_page),
         'tags': getTags(text),
         'label': getLabel(info),
         'website': url,

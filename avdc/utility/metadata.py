@@ -38,7 +38,6 @@ class Metadata:
 
         # image fields
         self.cover: str = self._get('cover', '')
-        self.small_cover: str = self._get('small_cover', '')
         self.images: list[str] = self._get('images', [])
 
         # source fields

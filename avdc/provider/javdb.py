@@ -188,13 +188,13 @@ def main(keyword: str) -> Metadata:
 
     # no cut image by default
     # If gray image exists ,then replace with normal cover
-    if re.search(r'[a-zA-Z]+\.\d{2}\.\d{2}\.\d{2}', keyword):
-        small_cover = getSmallCover(query_result)
-    else:
-        small_cover = getSmallCover(query_result, index=ids.index(keyword))
-    if 'placeholder' in small_cover:
-        # replace wit normal cover and cut it
-        small_cover = getCover(detail_page)
+    # if re.search(r'[a-zA-Z]+\.\d{2}\.\d{2}\.\d{2}', keyword):
+    #     small_cover = getSmallCover(query_result)
+    # else:
+    #     small_cover = getSmallCover(query_result, index=ids.index(keyword))
+    # if 'placeholder' in small_cover:
+    #     # replace wit normal cover and cut it
+    #     small_cover = getCover(detail_page)
 
     vid = getVID(detail_page)
     title = getTitle(detail_page)
@@ -212,7 +212,7 @@ def main(keyword: str) -> Metadata:
         'release': getRelease(detail_page),
         'vid': vid,
         'cover': getCover(detail_page),
-        'small_cover': small_cover,
+        # 'small_cover': small_cover,
         'images': getImages(detail_page),
         'tags': getTags(detail_page),
         'label': getLabel(detail_page),

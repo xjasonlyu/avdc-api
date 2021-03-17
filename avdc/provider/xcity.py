@@ -165,7 +165,7 @@ def main(keyword: str) -> Metadata:
         'release': getRelease(detail_page),
         'vid': getVID(detail_page),
         'cover': getCover(detail_page),
-        'small_cover': '',
+        # 'small_cover': '',
         'images': getImages(detail_page),
         'tags': getTags(detail_page),
         'label': getLabel(detail_page),

@@ -8,12 +8,8 @@ from avdc.utility.metadata import Metadata
 
 
 def getTitle(a: str) -> str:
-    try:
-        html = etree.fromstring(a, etree.HTMLParser())
-        result = str(html.xpath('//*[@id="center_column"]/div[1]/h1/text()')).strip(" ['']")
-        return result.replace('/', ',')
-    except:
-        return ''
+    html = etree.fromstring(a, etree.HTMLParser())
+    return str(html.xpath('//*[@id="center_column"]/div[1]/h1/text()')[0]).strip()
 
 
 def getStars(a: str) -> list[str]:  # //*[@id="center_column"]/div[2]/div[1]/div/table/tbody/tr[1]/td/text()
@@ -157,7 +153,7 @@ def main(keyword: str) -> Metadata:
         'release': getRelease(a),
         'vid': getVID(a),
         'cover': getCover(text),
-        'small_cover': getSmallCover(text),
+        # 'small_cover': getSmallCover(text),
         'tags': getTags(a),
         'label': getLabel(a),
         'images': getImages(text),
