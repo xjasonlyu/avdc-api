@@ -66,7 +66,7 @@ def getRelease(a: str) -> str:
     return str(result1 + result2).strip('+').replace('/', '-')
 
 
-def getTags(a: str) -> list[str]:
+def getGenres(a: str) -> list[str]:
     html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     result1 = str(html.xpath('//th[contains(text(),"ジャンル：")]/../td/a/text()')).strip(" ['']").strip('\\n    ').strip(
         '\\n')
@@ -154,7 +154,7 @@ def main(keyword: str) -> Metadata:
         'vid': getVID(a),
         'cover': getCover(text),
         # 'small_cover': getSmallCover(text),
-        'tags': getTags(a),
+        'genres': getGenres(a),
         'label': getLabel(a),
         'images': getImages(text),
         # 'star_photos': '',

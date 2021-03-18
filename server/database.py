@@ -35,7 +35,7 @@ class Metadata(BasicModel):
 
     # info fields
     overview = TextField()
-    tags = ArrayField()
+    genres = ArrayField()
     label = TextField()
     studio = TextField()
     series = TextField()

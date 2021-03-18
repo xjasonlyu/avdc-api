@@ -42,7 +42,7 @@ def getCover(text: str) -> str:
     return 'http:' + result
 
 
-def getTags(number: str) -> list[str]:
+def getGenres(number: str) -> list[str]:
     text = str(bytes(get_html('http://adult.contents.fc2.com/api/v4/article/' + number + '/tag?'), 'utf-8').decode(
         'unicode-escape'))
     result = re.findall('"tag":"(.*?)"', text)
@@ -80,7 +80,7 @@ def main(keyword: str) -> Metadata:
         'label': '',
         'cover': getCover(text),
         'images': getImages(text),
-        'tags': getTags(keyword),
+        'genres': getGenres(keyword),
         'website': url,
         'source': 'fc2',
         'series': '',

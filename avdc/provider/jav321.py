@@ -68,7 +68,7 @@ def getLabel(data: hash) -> str:
         return ""
 
 
-def getTags(data: hash) -> list[str]:
+def getGenres(data: hash) -> list[str]:
     if "ジャンル" in data:
         return get_anchor_info(data["ジャンル"]).split(",")
     else:
@@ -134,7 +134,7 @@ def parse_info(soup: BeautifulSoup) -> dict:
             'stars': getStars(data_dic),
             'label': getLabel(data_dic),
             'studio': getStudio(data_dic),
-            'tags': getTags(data_dic),
+            'genres': getGenres(data_dic),
             'vid': getVID(data_dic),
             'release': getRelease(data_dic),
             'runtime': getRuntime(data_dic),

@@ -66,7 +66,7 @@ def getSmallCover(content: str) -> str:
     return result
 
 
-def getTags(content: str) -> list[str]:
+def getGenres(content: str) -> list[str]:
     soup = BeautifulSoup(content, 'lxml')
     a = soup.find_all(attrs={'class': 'genre'})
     d = []
@@ -116,7 +116,7 @@ def main(keyword: str) -> Metadata:
         'vid': getVID(info),
         'cover': getCover(text),
         # 'small_cover': getSmallCover(search_page),
-        'tags': getTags(text),
+        'genres': getGenres(text),
         'label': getLabel(info),
         'website': url,
         'source': 'avsox',

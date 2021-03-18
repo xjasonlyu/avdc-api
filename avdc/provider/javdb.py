@@ -96,7 +96,7 @@ def getRelease(a: str) -> str:
     return result
 
 
-def getTags(a: str) -> list[str]:
+def getGenres(a: str) -> list[str]:
     html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     try:
         return html.xpath('//strong[contains(text(),"類別")]/../span/a/text()')
@@ -214,7 +214,7 @@ def main(keyword: str) -> Metadata:
         'cover': getCover(detail_page),
         # 'small_cover': small_cover,
         'images': getImages(detail_page),
-        'tags': getTags(detail_page),
+        'genres': getGenres(detail_page),
         'label': getLabel(detail_page),
         # 'star_photos': getActorPhoto(detail_page),
         'website': 'https://javdb.com' + correct_url,

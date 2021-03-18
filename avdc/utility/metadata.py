@@ -26,7 +26,7 @@ class Metadata:
         self.label: str = self._get('label', '')
         self.studio: str = self._get('studio', '')
         self.series: str = self._get('series', '')
-        self.tags: list[str] = self._get('tags', [])
+        self.genres: list[str] = self._get('genres', [])
 
         # cast fields
         self.stars: list[str] = self._get('stars', [])

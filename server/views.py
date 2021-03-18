@@ -78,7 +78,7 @@ def _metadata(vid: str, c: bool):
                        message=f'metadata not found: {vid}'), HTTPStatus.NOT_FOUND
 
     if c:  # add chinese subtitle tag
-        m.tags.append('中文字幕')
+        m.genres.append('中文字幕')
 
     return jsonify(**m.toDict(),
                    year=extractYear(m.release))

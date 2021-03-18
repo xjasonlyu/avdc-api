@@ -101,7 +101,7 @@ def getRelease(text: str) -> str:
     return result.replace("/", "-")
 
 
-def getTags(text: str) -> list[str]:
+def getGenres(text: str) -> list[str]:
     html = etree.fromstring(text, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     try:
         result = html.xpath("//td[contains(text(),'ジャンル：')]/following-sibling::td/a/text()")
@@ -245,7 +245,7 @@ def main(keyword: str) -> Metadata:
         'release': getRelease(text),
         'vid': fanza_hinban,
         'cover': getCover(text, fanza_hinban),
-        'tags': getTags(text),
+        'genres': getGenres(text),
         'images': getImages(text),
         'label': getLabel(text),
         'website': chosen_url,

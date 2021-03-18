@@ -66,7 +66,7 @@ def getRelease(a: str) -> str:
     return result.replace('年', '-').replace('月', '-').replace('日', '')
 
 
-def getTags(a: str) -> list[str]:
+def getGenres(a: str) -> list[str]:
     tree = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     return tree.xpath('//th[contains(text(),"分类")]/../td/div/a/text()')
 
@@ -143,7 +143,7 @@ def main(keyword: str) -> Metadata:
         'vid': keyword,
         'cover': 'https:' + getCover(text),
         # 'small_cover': '',
-        'tags': getTags(text),
+        'genres': getGenres(text),
         'label': getLabel(text),
         # 'star_photos': '',
         'website': url,

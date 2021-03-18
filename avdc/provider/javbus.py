@@ -67,7 +67,7 @@ def getStars(text: str) -> list[str]:  # 获取女优
     return [i.get_text() for i in soup.find_all(attrs={'class': 'star-name'})]
 
 
-def getTags(text: str) -> list[str]:  # 获取标签
+def getGenres(text: str) -> list[str]:  # 获取标签
     soup = BeautifulSoup(text, 'lxml')
     result = soup.find_all(attrs={'class': 'genre'})
     return [i.get_text().strip() for i in result if 'gr_sel' in str(i)]
@@ -128,7 +128,7 @@ def main(keyword: str) -> Metadata:
         'release': getRelease(text),
         'vid': getVID(text),
         'cover': getCover(text),
-        'tags': getTags(text),
+        'genres': getGenres(text),
         'images': getImages(text),
         'label': getSeries(text),
         'website': url,

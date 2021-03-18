@@ -74,7 +74,7 @@ def getRelease(a: str) -> str:
     return ''
 
 
-def getTags(a: str) -> list[str]:
+def getGenres(a: str) -> list[str]:
     html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     # //*[@id="avodDetails"]/div/div[3]/div[2]/div/ul[1]/li[5]
     result = html.xpath('//*[@id="avodDetails"]/div/div[3]/div[2]/div/ul[1]/li[5]/a/text()')
@@ -167,7 +167,7 @@ def main(keyword: str) -> Metadata:
         'cover': getCover(detail_page),
         # 'small_cover': '',
         'images': getImages(detail_page),
-        'tags': getTags(detail_page),
+        'genres': getGenres(detail_page),
         'label': getLabel(detail_page),
         # 'star_photos': '',
         'website': 'https://xcity.jp' + urls,
