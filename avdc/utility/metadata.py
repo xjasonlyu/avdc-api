@@ -22,7 +22,7 @@ class Metadata:
         # info fields
         self.overview: str = self._get('overview', '')
         self.release: str = str(self._get('release', ''))
-        self.runtime: int = int(self._get('runtime', 0))
+        self.runtime: int = self._get_runtime()
         self.label: str = self._get('label', '')
         self.studio: str = self._get('studio', '')
         self.series: str = self._get('series', '')
@@ -82,6 +82,12 @@ class Metadata:
 
     def _get(self, key: str, default: Any = None) -> Any:
         return self._raw.get(key) or default
+
+    def _get_runtime(self) -> int:
+        try:
+            return int(self._get('runtime'))
+        except ValueError:
+            return 0
 
     def get(self, key: str, default: Any = None) -> Any:
         if not hasattr(self, key):
