@@ -37,7 +37,10 @@ def _index():
 
 @app.route('/actress/<name>')
 def _actress(name: str):
-    images = api.GetActressByName(name)
+    update = api.str_to_bool(
+        request.args.get('update'))
+
+    images = api.GetActressByName(name, update=update)
     if not images:
         return jsonify(status=False,
                        message=f'actress not found: {name}'), HTTPStatus.NOT_FOUND

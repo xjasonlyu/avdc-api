@@ -8,13 +8,15 @@ from avdc.utility.httpclient import get_html, Session, ResponseStream
 from avdc.utility.imagesize import getSize
 from avdc.utility.misc import concurrentMap
 
-REPO_URL = 'https://raw.githubusercontent.com/xinxin8816/gfriends/master'
+REPO = 'xinxin8816/gfriends'
+
+REPO_RAW_URL = f'https://raw.githubusercontent.com/{REPO}/master'
 
 
 @cached(cache=TTLCache(maxsize=1, ttl=3600))
 def _getIndex() -> dict:
-    text = get_html(REPO_URL + '/Filetree.json')
-    return json.loads(text)
+    url = f'{REPO_RAW_URL}/Filetree.json'
+    return json.loads(get_html(url, raise_for_status=True))
 
 
 def getImageSize(url: str) -> tuple[int, int]:
@@ -28,11 +30,11 @@ def search(name: str) -> list[str]:
     content: dict[str, dict[str, str]] = _getIndex().get('Content')
 
     result_set = set()
-    for studio in content.keys():
-        for img in content[studio]:
+    for company in content.keys():
+        for img in content[company]:
             if name == splitext(img)[0]:
-                result_set.add('/'.join([REPO_URL, 'Content',
-                                         quote(studio), quote(content[studio][img])]))
+                result_set.add('/'.join([REPO_RAW_URL, 'Content',
+                                         quote(company), quote(content[company][img])]))
 
     results = list(result_set)
     if results:  # auto sort by height and width

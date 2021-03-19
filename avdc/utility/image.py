@@ -10,7 +10,7 @@ from avdc.utility.httpclient import get_blob
 
 
 def getRawImageByURL(url: str) -> bytes:
-    return get_blob(url)
+    return get_blob(url, raise_for_status=True)
 
 
 def getRawImageFormat(data: bytes) -> Optional[str]:
