@@ -68,6 +68,8 @@ def _actress_image(name: str, index: int = 0):
 @app.route('/metadata/<vid>')
 @api.extract_vid
 def _metadata(vid: str, c: bool):
+    chs = api.str_to_bool(
+        request.args.get('chs'))
     update = api.str_to_bool(
         request.args.get('update'))
 
@@ -76,7 +78,7 @@ def _metadata(vid: str, c: bool):
         return jsonify(status=False,
                        message=f'metadata not found: {vid}'), HTTPStatus.NOT_FOUND
 
-    if c:  # add chinese subtitle tag
+    if c and chs:  # auto add `中文字幕` genre
         m.genres.append('中文字幕')
 
     return jsonify(m.toDict())
