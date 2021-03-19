@@ -1,8 +1,6 @@
 import re
 from concurrent import futures
-from datetime import datetime
 from os.path import splitext
-from typing import Optional
 
 
 def concurrentMap(fn, *args, timeout=None, max_workers=None):
@@ -21,13 +19,6 @@ def parseVID(name: str) -> tuple[str, bool]:
     if name[-2:].upper() in ('-C', '-R'):
         return name[:-2], True
     return name, False
-
-
-def extractYear(_s: str) -> Optional[int]:
-    try:
-        return datetime.strptime(_s, '%Y-%m-%d').year
-    except (ValueError, TypeError):
-        return
 
 
 if __name__ == '__main__':

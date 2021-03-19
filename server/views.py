@@ -6,7 +6,6 @@ from flask import request
 from werkzeug.exceptions import HTTPException
 
 from avdc.utility import image
-from avdc.utility.misc import extractYear
 from server import api
 from server import app
 from server.database import sqlite_db_init
@@ -80,8 +79,7 @@ def _metadata(vid: str, c: bool):
     if c:  # add chinese subtitle tag
         m.genres.append('中文字幕')
 
-    return jsonify(**m.toDict(),
-                   year=extractYear(m.release))
+    return jsonify(m.toDict())
 
 
 @app.route('/image/backdrop/<vid>')
