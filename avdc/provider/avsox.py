@@ -14,7 +14,7 @@ def getTitle(content: str) -> str:
     return extractTitle(title)
 
 
-def getStars(content: str) -> list[str]:  # //*[@id="center_column"]/div[2]/div[1]/div/table/tbody/tr[1]/td/text()
+def getActresses(content: str) -> list[str]:  # //*[@id="center_column"]/div[2]/div[1]/div/table/tbody/tr[1]/td/text()
     soup = BeautifulSoup(content, 'lxml')
     a = soup.find_all(attrs={'class': 'avatar-box'})
     d = []
@@ -106,7 +106,7 @@ def main(keyword: str) -> Metadata:
     info = str(soup.find(attrs={'class': 'row movie'}))
 
     return Metadata({
-        'stars': getStars(text),
+        'actresses': getActresses(text),
         'title': getTitle(text),
         'studio': getStudio(info),
         'overview': '',  #

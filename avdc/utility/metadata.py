@@ -29,7 +29,7 @@ class Metadata:
         self.genres: list[str] = self._get('genres', [])
 
         # cast fields
-        self.stars: list[str] = self._get('stars', [])
+        self.actresses: list[str] = self._get('actresses', [])
         self.director: str = self._get('director', '')
 
         # image fields

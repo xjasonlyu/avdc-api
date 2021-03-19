@@ -12,13 +12,13 @@ def getTitle(a: str) -> str:
     return str(html.xpath('//*[@id="center_column"]/div[1]/h1/text()')[0]).strip()
 
 
-def getStars(a: str) -> list[str]:  # //*[@id="center_column"]/div[2]/div[1]/div/table/tbody/tr[1]/td/text()
+def getActresses(a: str) -> list[str]:  # //*[@id="center_column"]/div[2]/div[1]/div/table/tbody/tr[1]/td/text()
     html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     result1 = str(html.xpath('//th[contains(text(),"出演：")]/../td/a/text()')).strip(" ['']").strip('\\n    ').strip(
         '\\n')
     result2 = str(html.xpath('//th[contains(text(),"出演：")]/../td/text()')).strip(" ['']").strip('\\n    ').strip('\\n')
-    stars = str(result1 + result2).strip('+').replace("', '", '').replace('"', '').replace('/', ',').replace('\\n', '')
-    return [i.strip() for i in stars.split() if i.strip()]
+    actresses = str(result1 + result2).strip('+').replace("', '", '').replace('"', '').replace('/', ',').replace('\\n', '')
+    return [i.strip() for i in actresses.split() if i.strip()]
 
 
 def getStudio(a: str) -> str:
@@ -149,7 +149,7 @@ def main(keyword: str) -> Metadata:
         'overview': getOverview(b),
         'runtime': getRuntime(a),
         # 'director': getDirector(a),
-        'stars': getStars(a),
+        'actresses': getActresses(a),
         'release': getRelease(a),
         'vid': getVID(a),
         'cover': getCover(text),

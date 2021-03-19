@@ -11,7 +11,7 @@ sqlite_db = SqliteDatabase(
 def sqlite_db_init(db: str):
     sqlite_db.init(database=db)
     # create table if not exist
-    sqlite_db.create_tables([Metadata, People, Cover])
+    sqlite_db.create_tables([Metadata, Actress, Cover])
 
 
 class ArrayField(Field):
@@ -42,7 +42,7 @@ class Metadata(BasicModel):
     runtime = IntegerField()
 
     # cast fields
-    stars = ArrayField()
+    actresses = ArrayField()
     director = TextField()
 
     # image fields
@@ -60,7 +60,7 @@ class Metadata(BasicModel):
     last_modified = DateTimeField(default=datetime.now)
 
 
-class People(BasicModel):
+class Actress(BasicModel):
     name = CharField(primary_key=True, unique=True)
     images = ArrayField()
 

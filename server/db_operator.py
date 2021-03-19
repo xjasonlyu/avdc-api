@@ -4,7 +4,7 @@ from peewee import DoesNotExist
 
 from avdc.utility.image import getRawImageFormat
 from avdc.utility.metadata import Metadata as _M
-from server.database import Metadata, People, Cover
+from server.database import Metadata, Actress, Cover
 
 
 def GetMetadataByVID(vid: str) -> Optional[_M]:
@@ -25,16 +25,16 @@ def StoreMetadata(metadata: _M, update: bool = False):
      .execute())
 
 
-def GetPeopleByName(name: str) -> Optional[list[str]]:
+def GetActressByName(name: str) -> Optional[list[str]]:
     try:
-        results: People = People.get((People.name == name))
+        results: Actress = Actress.get((Actress.name == name))
     except DoesNotExist:
         return
     return results.images
 
 
-def StorePeople(name: str, images: list[str], update: bool = False):
-    (People
+def StoreActress(name: str, images: list[str], update: bool = False):
+    (Actress
      .insert(name=name, images=images)
      .on_conflict('REPLACE' if update else 'IGNORE')
      .execute())

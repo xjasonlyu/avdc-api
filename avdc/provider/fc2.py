@@ -13,9 +13,9 @@ def getTitle(text: str) -> str:
     return result
 
 
-def getStars(text: str) -> list[str]:
+def getActresses(text: str) -> list[str]:
     _ = text
-    return []  # fc2 no stars
+    return []  # fc2 no actresses
 
 
 def getStudio(text: str) -> str:  # 获取厂商
@@ -74,7 +74,7 @@ def main(keyword: str) -> Metadata:
         'overview': '',  # getOverview(text),
         'runtime': '',
         'director': getStudio(text),
-        'stars': getStars(text),
+        'actresses': getActresses(text),
         'release': getRelease(text),
         'vid': 'FC2-' + keyword,
         'label': '',

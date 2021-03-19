@@ -62,7 +62,7 @@ def getOverview(_: str) -> str:
     return ''  # javbus don't provide overview
 
 
-def getStars(text: str) -> list[str]:  # 获取女优
+def getActresses(text: str) -> list[str]:  # 获取女优
     soup = BeautifulSoup(text, 'lxml')
     return [i.get_text() for i in soup.find_all(attrs={'class': 'star-name'})]
 
@@ -124,7 +124,7 @@ def main(keyword: str) -> Metadata:
         'overview': getOverview(text),
         'runtime': getRuntime(text),
         'director': getDirector(text),
-        'stars': getStars(text),
+        'actresses': getActresses(text),
         'release': getRelease(text),
         'vid': getVID(text),
         'cover': getCover(text),

@@ -12,7 +12,7 @@ def getTitle(a: str) -> str:
     return result
 
 
-def getStars(a: str) -> list[str]:  # //*[@id="center_column"]/div[2]/div[1]/div/table/tbody/tr[1]/td/text()
+def getActresses(a: str) -> list[str]:  # //*[@id="center_column"]/div[2]/div[1]/div/table/tbody/tr[1]/td/text()
     html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     result = html.xpath('//*[@id="avodDetails"]/div/div[3]/div[2]/div/ul[1]/li[2]/a/text()')
     if not result:
@@ -156,7 +156,7 @@ def main(keyword: str) -> Metadata:
     detail_page = get_html('https://xcity.jp' + urls)
 
     return Metadata({
-        'stars': getStars(detail_page),
+        'actresses': getActresses(detail_page),
         'title': getTitle(detail_page),
         'studio': getStudio(detail_page),
         'overview': getOverview(detail_page),

@@ -36,22 +36,22 @@ def _index():
     return jsonify(status=True, message='AVDC')
 
 
-@app.route('/people/<name>')
-def _people(name: str):
-    images = api.GetPeopleByName(name)
+@app.route('/actress/<name>')
+def _actress(name: str):
+    images = api.GetActressByName(name)
     if not images:
         return jsonify(status=False,
-                       message=f'people not found: {name}'), HTTPStatus.NOT_FOUND
+                       message=f'actress not found: {name}'), HTTPStatus.NOT_FOUND
     return jsonify(images)
 
 
-@app.route('/image/people/<name>')
-@app.route('/image/people/<name>/<int:index>')
-def _people_image(name: str, index: int = 0):
-    images = api.GetPeopleByName(name)
+@app.route('/image/actress/<name>')
+@app.route('/image/actress/<name>/<int:index>')
+def _actress_image(name: str, index: int = 0):
+    images = api.GetActressByName(name)
     if not images:
         return jsonify(status=False,
-                       message=f'people image not found: {name}'), HTTPStatus.NOT_FOUND
+                       message=f'actress image not found: {name}'), HTTPStatus.NOT_FOUND
 
     try:
         url = images[index]

@@ -12,13 +12,13 @@ def getTitle(a: str) -> str:
     return result
 
 
-def getStars(a: str) -> list[str]:  # //*[@id="center_column"]/div[2]/div[1]/div/table/tbody/tr[1]/td/text()
+def getActresses(a: str) -> list[str]:  # //*[@id="center_column"]/div[2]/div[1]/div/table/tbody/tr[1]/td/text()
     html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     result1 = str(html.xpath('//strong[contains(text(),"演員")]/../span/text()')).strip(" ['']")
     result2 = str(html.xpath('//strong[contains(text(),"演員")]/../span/a/text()')).strip(" ['']")
-    stars = str(result1 + result2).strip('+').replace(",\\xa0", "").replace("'", ""). \
+    actresses = str(result1 + result2).strip('+').replace(",\\xa0", "").replace("'", ""). \
         replace(' ', '').replace(',,', '').replace('N/A', '').lstrip(',').replace(',', ', ')
-    return [i.strip() for i in stars.split(',')]
+    return [i.strip() for i in actresses.split(',')]
 
 
 def getOnePhoto(url: str) -> str:
@@ -31,16 +31,16 @@ def getOnePhoto(url: str) -> str:
         return ''
 
 
-def getActorPhoto(html: str) -> dict:  # //*[@id="star_qdt"]/li/a/img
+def getActressPhoto(html: str) -> dict:  # //*[@id="star_qdt"]/li/a/img
     r = re.compile(r'<strong>演員:</strong>\s*?.*?<span class=\"value\">(.*)\s*?</div>')
     results = r.findall(html)
 
     if results:
         item = results[0]
         ar = re.compile(r'<a href=\"(.*?)\">(.*?)</a>')
-        stars = ar.findall(item)
+        actresses = ar.findall(item)
         star_photos = {}
-        for i in stars:
+        for i in actresses:
             star_photos[i[1]] = getOnePhoto('https://javdb.com' + i[0])
         return star_photos
     else:
@@ -203,7 +203,7 @@ def main(keyword: str) -> Metadata:
         title = title.replace(vid, '').strip()
 
     return Metadata({
-        'stars': getStars(detail_page),
+        'actresses': getActresses(detail_page),
         'title': title,
         'studio': getStudio(detail_page),
         'overview': getOverview(detail_page),
@@ -216,7 +216,7 @@ def main(keyword: str) -> Metadata:
         'images': getImages(detail_page),
         'genres': getGenres(detail_page),
         'label': getLabel(detail_page),
-        # 'star_photos': getActorPhoto(detail_page),
+        # 'star_photos': getActressPhoto(detail_page),
         'website': 'https://javdb.com' + correct_url,
         'source': 'javdb',
         'series': getSeries(detail_page),

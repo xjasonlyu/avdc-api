@@ -54,7 +54,7 @@ def getOverview(lx: html.HtmlElement) -> str:
     return result[0] if result else ''
 
 
-def getStars(data: hash) -> list[str]:
+def getActresses(data: hash) -> list[str]:
     if "出演者" in data:
         return get_anchor_info(data["出演者"]).split(",")
     else:
@@ -131,7 +131,7 @@ def parse_info(soup: BeautifulSoup) -> dict:
             data_dic[get_bold_text(h=d)] = d
 
         return {
-            'stars': getStars(data_dic),
+            'actresses': getActresses(data_dic),
             'label': getLabel(data_dic),
             'studio': getStudio(data_dic),
             'genres': getGenres(data_dic),

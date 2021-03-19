@@ -38,7 +38,7 @@ docker run -d \
 | Endpoint | Description |
 | --- | ----------- |
 | `/metadata/<id>` | Fetch Video Metadata |
-| `/people/<name>` | Fetch Actress Avatar |
-| `/image/people/<name>` | Fetch `2/3` People Image |
+| `/actress/<name>` | Fetch Actress URL |
+| `/image/actress/<name>` | Fetch `2/3` Actress Image |
 | `/image/primary/<id>` | Fetch `2/3` Cropped Cover Image |
 | `/image/backdrop/<id>` | Fetch Full Size Cover Image |

@@ -24,7 +24,7 @@ def getTitle(a: str) -> str:
     return extractTitle(title)
 
 
-def getStars(a: str) -> list[str]:  # //*[@id="center_column"]/div[2]/div[1]/div/table/tbody/tr[1]/td/text()
+def getActresses(a: str) -> list[str]:  # //*[@id="center_column"]/div[2]/div[1]/div/table/tbody/tr[1]/td/text()
     tree = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     return tree.xpath('//th[contains(text(),"声优")]/../td/a/text()')
 
@@ -133,7 +133,7 @@ def main(keyword: str) -> Metadata:
                     raise_for_status=True)
 
     return Metadata({
-        'stars': getStars(text),
+        'actresses': getActresses(text),
         'title': getTitle(text),
         'studio': getStudio(text),
         'overview': getOverview(text),

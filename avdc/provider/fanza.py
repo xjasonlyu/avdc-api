@@ -15,7 +15,7 @@ def getTitle(text: str) -> str:
     return extractTitle(title)
 
 
-def getStars(text: str) -> str:
+def getActresses(text: str) -> str:
     # //*[@id="center_column"]/div[2]/div[1]/div/table/tbody/tr[1]/td/text()
     html = etree.fromstring(text, etree.HTMLParser())
     result = (
@@ -241,7 +241,7 @@ def main(keyword: str) -> Metadata:
         'overview': getOverview(text),
         'runtime': getRuntime(text),
         'director': getDirector(text) if 'anime' not in chosen_url else '',
-        'stars': getStars(text) if 'anime' not in chosen_url else '',
+        'actresses': getActresses(text) if 'anime' not in chosen_url else '',
         'release': getRelease(text),
         'vid': fanza_hinban,
         'cover': getCover(text, fanza_hinban),

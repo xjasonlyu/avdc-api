@@ -3,7 +3,7 @@ import re
 from functools import wraps
 from typing import Any, Callable, Optional
 
-from avdc.people import gfriends
+from avdc.actress import gfriends
 from avdc.provider import avsox
 from avdc.provider import dlsite
 from avdc.provider import fanza
@@ -126,9 +126,9 @@ def GetMetadataByVID(vid: str, update: bool = False) -> Optional[Metadata]:
     return m
 
 
-def GetPeopleByName(name: str, update: bool = False) -> Optional[list[str]]:
+def GetActressByName(name: str, update: bool = False) -> Optional[list[str]]:
     if not update:
-        images = db_operator.GetPeopleByName(name)
+        images = db_operator.GetActressByName(name)
         if images:
             return images
 
@@ -137,7 +137,7 @@ def GetPeopleByName(name: str, update: bool = False) -> Optional[list[str]]:
         return
 
     # store to database
-    db_operator.StorePeople(name, images, update=update)
+    db_operator.StoreActress(name, images, update=update)
     app.logger.info(f'store {name} images to database')
     return images
 
@@ -179,7 +179,7 @@ if __name__ == '__main__':
     # sqlite_db_init('../avdc.db')
     #
     # print(GetMetadataByVID('abp-233', update=True))
-    # print(GetPeopleByName('通野未帆'))
+    # print(GetActressByName('通野未帆'))
     print(_getRemoteMetadata('100518-766'))
     # models.UpdateMetadata(m)
 
