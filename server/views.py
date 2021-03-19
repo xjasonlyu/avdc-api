@@ -42,7 +42,7 @@ def _actress(name: str):
     if not images:
         return jsonify(status=False,
                        message=f'actress not found: {name}'), HTTPStatus.NOT_FOUND
-    return jsonify(images)
+    return jsonify(name=name, images=images)
 
 
 @app.route('/image/actress/<name>')
