@@ -17,33 +17,36 @@ def _getIndex() -> dict:
     return json.loads(text)
 
 
-def getImageHeight(url: str) -> int:
+def getImageSize(url: str) -> tuple[int, int]:
     with Session() as session:
         r = session.get(url, stream=True)
         stream = ResponseStream(r.iter_content(chunk_size=64))
-        return getSize(stream)[1]
+        return getSize(stream)  # width, height
 
 
 def search(name: str) -> list[str]:
-    content = _getIndex().get('Content')
+    content: dict[str, dict[str, str]] = _getIndex().get('Content')
 
-    results = []
-    for studio in content:
+    result_set = set()
+    for studio in content.keys():
         for img in content[studio]:
             if name == splitext(img)[0]:
-                results.append('/'.join([REPO_URL, 'Content',
+                result_set.add('/'.join([REPO_URL, 'Content',
                                          quote(studio), quote(content[studio][img])]))
 
-    if results:  # auto sort by image height
-        sizes = concurrentMap(getImageHeight, results, max_workers=len(results))
-        results = [i for _, i in sorted(zip(sizes, results), reverse=True)]
-
+    results = list(result_set)
+    if results:  # auto sort by height and width
+        sizes = concurrentMap(getImageSize, results, max_workers=len(results))
+        results = [i for _, i in sorted(zip(sizes, results),
+                                        key=lambda x: (x[0][1], x[0][0]), reverse=True)]
     return results
 
 
 if __name__ == '__main__':
     # print(search('霧島レオナ'))
-    print(search('高瀬りな'))
+    # print(search('高瀬りな'))
     # print(search('橋本ありな'))
     # print(search('桜空もも'))
     # print(search('鈴木心春'))
+    # print(search('三原ほのか'))
+    print(search('詩音乃らん'))
