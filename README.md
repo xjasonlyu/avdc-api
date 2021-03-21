@@ -30,6 +30,8 @@ docker run -d \
     -v $PWD/avdc.db:/avdc.db \                # optional
     -e HTTP_PROXY=http://192.168.1.1:1080 \   # optional
     -e HTTPS_PROXY=http://192.168.1.1:1080 \  # optional
+    -e AVDC_DB=/avdc.db \                     # default
+    -e AVDC_TOKEN= \                          # optional
     ghcr.io/xjasonlyu/avdc:latest
 ```
 
