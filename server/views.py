@@ -16,6 +16,22 @@ def _init_database():
     sqlite_db_init(app.config.get('DATABASE'))
 
 
+@app.before_request
+def _check_token():
+    token = app.config.get('TOKEN')
+    if not token:
+        return  # no authorization required
+
+    header = request.headers.get('Authorization', default='', type=str)
+    authorization = header.split(' ', maxsplit=1)
+
+    if len(authorization) != 2 \
+            or authorization[0] != 'Bearer' \
+            or authorization[1] != token:
+        return jsonify(status=False,
+                       message='unauthorized'), HTTPStatus.UNAUTHORIZED
+
+
 @app.errorhandler(Exception)
 def _return_json_if_error_occurred(e):
     if isinstance(e, HTTPException):

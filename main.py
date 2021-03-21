@@ -1,4 +1,5 @@
 import argparse
+import os
 
 from werkzeug.serving import run_simple
 
@@ -14,6 +15,7 @@ def parse_arguments():
                         help='port to serve [Default=5000]')
     parser.add_argument('-d', '--database', type=str, default='avdc.db',
                         help='database to load [Default=avdc.db]')
+    parser.add_argument('-t', '--token', type=str, help='token for avdc api')
     parser.add_argument('--debug', action='store_true',
                         help='enable debug mode')
 
@@ -22,7 +24,9 @@ def parse_arguments():
 
 def main():
     args = parse_arguments()
-    app.config.update(DATABASE=args.database)
+
+    app.config.update(DATABASE=os.environ.get('AVDC_DB') or args.database)
+    app.config.update(TOKEN=os.environ.get('AVDC_TOKEN') or args.token)
 
     run_simple(hostname=args.bind,
                port=args.port,
