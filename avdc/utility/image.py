@@ -20,7 +20,8 @@ def getRawImageFormat(data: bytes) -> Optional[str]:
     #     return
     # else:
     #     return im.format
-    return imghdr.what(BytesIO(data))
+    with BytesIO(data) as f:
+        return imghdr.what(f)
 
 
 def getImageSize(img: np.ndarray) -> tuple[int, int]:
@@ -29,20 +30,21 @@ def getImageSize(img: np.ndarray) -> tuple[int, int]:
 
 
 def bytesToImage(data: bytes, mode: str = 'RGB') -> np.ndarray:
-    im: Image.Image = Image.open(BytesIO(data))
-    if mode:
-        im = im.convert(mode)
-    return np.array(im)
+    with BytesIO(data) as f:
+        im: Image.Image = Image.open(f)
+        if mode:
+            im = im.convert(mode)
+        return np.array(im)
 
 
 def imageToBytes(img: np.ndarray, fmt: str = 'JPEG', quality: int = 95, subsampling: int = 0) -> bytes:
     im: Image.Image = Image.fromarray(img)
-    buffer = BytesIO()
-    im.save(buffer,
-            format=fmt,
-            quality=quality,
-            subsampling=subsampling)
-    return buffer.getvalue()
+    with BytesIO() as f:
+        im.save(f,
+                format=fmt,
+                quality=quality,
+                subsampling=subsampling)
+        return f.getvalue()
 
 
 def getFaceCenter(loc: tuple[int, int, int, int]) -> tuple[int, int]:
