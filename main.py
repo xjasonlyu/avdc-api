@@ -7,7 +7,7 @@ from server import app
 
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(prog='AVDC')
+    parser = argparse.ArgumentParser(prog='avdc-api')
 
     parser.add_argument('-b', '--bind', type=str, default='0.0.0.0',
                         help='host to serve [Default=0.0.0.0]')

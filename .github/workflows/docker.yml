@@ -38,5 +38,5 @@ jobs:
           push: true
           platforms: linux/amd64
           tags: |
-            xjasonlyu/avdc:latest
-            ghcr.io/xjasonlyu/avdc:latest
+            xjasonlyu/avdc-api:latest
+            ghcr.io/xjasonlyu/avdc-api:latest

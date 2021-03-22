@@ -48,7 +48,7 @@ def _return_json_if_error_occurred(e):
 
 @app.route('/')
 def _index():
-    return jsonify(status=True, message='AVDC')
+    return jsonify(status=True, message='AVDC-API')
 
 
 @app.route('/actress/<name>')
