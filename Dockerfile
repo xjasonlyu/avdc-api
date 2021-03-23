@@ -14,5 +14,5 @@ ENV HTTPS_PROXY=""
 ENV AVDC_DB="/avdc.db"
 ENV AVDC_TOKEN=""
 
-EXPOSE 5000
-ENTRYPOINT ["python", "-m", "main"]
+ENV PORT=5000
+ENTRYPOINT exec python -m main -p $PORT
