@@ -32,7 +32,7 @@ API 版本
 
 ## 文档
 
-跳转转至➡️ [Wiki](https://github.com/xjasonlyu/avdc-api/wiki)
+见➡️： [Wiki](https://github.com/xjasonlyu/avdc-api/wiki)
 
 ## API
 
