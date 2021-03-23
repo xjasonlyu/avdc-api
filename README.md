@@ -27,7 +27,7 @@ API 版本
 
 - **日本电影元数据 抓取工具 | 刮削器**，配合本地影片管理软件 Emby, Jellyfin, Kodi 等管理本地影片，该软件起到分类与元数据（metadata）抓取作用，利用元数据信息来分类，仅供本地影片分类整理使用。
 - 提供 [Jellyfin.Plugin.AVDC](https://github.com/xjasonlyu/jellyfin-plugin-avdc) 基于`Flask`的API后端的支持
-- 封面海报裁剪基于 [DLIB](http://dlib.net/) 的自动人脸识别，准确度更高，无需百度/谷歌等外部翻译
+- 封面海报裁剪基于 [face_recognition](https://github.com/ageitgey/face_recognition) 的人脸识别，无需百度/谷歌等外部翻译
 - 元数据存储在本地Sqlite数据库中，方便**数据快速存取**以及**共享服务端**
 
 ## 文档
