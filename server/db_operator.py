@@ -27,10 +27,10 @@ def StoreMetadata(metadata: _M, update: bool = False):
 
 def GetActressByName(name: str) -> Optional[list[str]]:
     try:
-        results: Actress = Actress.get((Actress.name == name))
+        result: Actress = Actress.get((Actress.name == name))
     except DoesNotExist:
         return
-    return results.images
+    return result.images
 
 
 def StoreActress(name: str, images: list[str], update: bool = False):
