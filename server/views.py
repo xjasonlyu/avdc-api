@@ -56,23 +56,23 @@ def _actress(name: str):
     update = api.str_to_bool(
         request.args.get('update'))
 
-    images = api.GetActressByName(name, update=update)
-    if not images:
+    info = api.GetActressByName(name, update=update)
+    if not info:
         return jsonify(status=False,
                        message=f'actress not found: {name}'), HTTPStatus.NOT_FOUND
-    return jsonify(name=name, images=images)
+    return jsonify(info.toDict())
 
 
 @app.route('/image/actress/<name>')
 @app.route('/image/actress/<name>/<int:index>')
 def _actress_image(name: str, index: int = 0):
-    images = api.GetActressByName(name)
-    if not images:
+    info = api.GetActressByName(name)
+    if not info or not info.images:
         return jsonify(status=False,
                        message=f'actress image not found: {name}'), HTTPStatus.NOT_FOUND
 
     try:
-        url = images[index]
+        url = info.images[index]
     except IndexError:
         return jsonify(status=False,
                        message=f'index out of range: {index}: {name}'), HTTPStatus.NOT_FOUND

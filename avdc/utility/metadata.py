@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import json
 from collections.abc import Iterable
-from typing import Any, Union
+from datetime import datetime
+from typing import Any, Optional, Union
 
 
 class MetadataError(Exception):
@@ -106,6 +107,55 @@ class Metadata:
     def toDict(self) -> dict:
         return {k: v for k, v in vars(self).items()
                 if not k.startswith('_')}
+
+
+class ActressInfo:
+
+    def __init__(self,
+                 name: str,
+                 birthday: Optional[str] = None,
+                 measurements: Optional[str] = None,
+                 cup_size: Optional[str] = None,
+                 av_activity: Optional[str] = None,
+                 sign: Optional[str] = None,
+                 blood_type: Optional[str] = None,
+                 height: Optional[str] = None,
+                 nationality: Optional[str] = None,
+                 images: Optional[list[str]] = None):
+        self.name = name
+        self.birthday = self.parseDate(birthday)
+        self.measurements = measurements
+        self.cup_size = cup_size
+        self.av_activity = self.parseDate(av_activity)
+        self.sign = sign
+        self.blood_type = blood_type
+        self.height = height
+        self.nationality = nationality
+        self.images = images
+
+    def __str__(self) -> str:
+        return self.toJSON()
+
+    @staticmethod
+    def parseDate(date) -> Optional[str]:
+        for fmt in ('%Y年%m月%d日', '%Y年%m月', '%Y年',
+                    '%A %d, %Y', '%A %Y', '%Y'):
+            try:
+                return datetime.strptime(date, fmt).strftime('%Y-%m-%d')
+            except (TypeError, ValueError):
+                continue
+
+    def toDict(self) -> dict:
+        return vars(self)
+
+    def toJSON(self) -> str:
+        return json.dumps(
+            self.toDict(),
+            ensure_ascii=False,
+            sort_keys=True,
+            indent=4,
+            separators=(",", ": "),
+        )
 
 
 def test():

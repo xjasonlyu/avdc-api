@@ -4,6 +4,7 @@ from functools import wraps
 from typing import Any, Callable, Optional
 
 from avdc.actress import gfriends
+from avdc.actress import xslist
 from avdc.provider import avsox
 from avdc.provider import dlsite
 from avdc.provider import fanza
@@ -20,6 +21,7 @@ from avdc.utility.image import (autoCropImage,
                                 imageToBytes,
                                 bytesToImage)
 from avdc.utility.metadata import Metadata
+from avdc.utility.metadata import ActressInfo
 from avdc.utility.misc import parseVID, concurrentMap
 from server import app
 from server import db_operator
@@ -35,6 +37,10 @@ def extract_vid(fn: Callable[[str, bool], Any]):
 
 def is_valid_metadata(_m: Any) -> bool:
     return isinstance(_m, Metadata)
+
+
+def is_valid_actress(_i: Any) -> bool:
+    return isinstance(_i, ActressInfo)
 
 
 def str_to_bool(s: str) -> bool:
@@ -126,20 +132,27 @@ def GetMetadataByVID(vid: str, update: bool = False) -> Optional[Metadata]:
     return m
 
 
-def GetActressByName(name: str, update: bool = False) -> Optional[list[str]]:
+def GetActressByName(name: str, update: bool = False) -> Optional[ActressInfo]:
     if not update:
-        images = db_operator.GetActressByName(name)
-        if images:
-            return images
+        info = db_operator.GetActressByName(name)
+        if is_valid_actress(info):
+            return info
 
     images = gfriends.search(name)
     if not images:
         return
 
+    info = xslist.main(name)
+    if not is_valid_actress(info):
+        info = ActressInfo(name=name)
+
+    # attach images
+    info.images = images
+
     # store to database
-    db_operator.StoreActress(name, images, update=update)
+    db_operator.StoreActress(info=info, update=update)
     app.logger.info(f'store {name} images to database')
-    return images
+    return info
 
 
 def _getCoverImageByVID(vid: str, update: bool = False) -> Optional[tuple[str, bytes]]:
