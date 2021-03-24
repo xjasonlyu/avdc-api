@@ -3,7 +3,7 @@ from typing import Optional
 from lxml import etree
 
 from avdc.utility.httpclient import get_html
-from avdc.utility.metadata import ActressInfo
+from avdc.utility.metadata import Actress
 
 XSLIST_URL = 'https://xslist.org/'
 
@@ -55,7 +55,7 @@ def main(name: str):
         return
 
     text = get_html(url, raise_for_status=True)
-    return ActressInfo(extractName(text), *extractInfo(text))
+    return Actress(extractName(text), *extractInfo(text))
 
 
 if __name__ == '__main__':

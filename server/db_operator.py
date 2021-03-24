@@ -3,8 +3,8 @@ from typing import Optional
 from peewee import DoesNotExist
 
 from avdc.utility.image import getRawImageFormat
+from avdc.utility.metadata import Actress as _A
 from avdc.utility.metadata import Metadata as _M
-from avdc.utility.metadata import ActressInfo as _A
 from server.database import Metadata, Actress, Cover
 
 
@@ -34,9 +34,9 @@ def GetActressByName(name: str) -> Optional[_A]:
     return _A(**result.__data__)
 
 
-def StoreActress(info: _A, update: bool = False):
+def StoreActress(actress: _A, update: bool = False):
     (Actress
-     .insert(**info.toDict())
+     .insert(**actress.toDict())
      .on_conflict('REPLACE' if update else 'IGNORE')
      .execute())
 

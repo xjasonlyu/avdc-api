@@ -20,8 +20,8 @@ from avdc.utility.image import (autoCropImage,
                                 getRawImageFormat,
                                 imageToBytes,
                                 bytesToImage)
+from avdc.utility.metadata import Actress
 from avdc.utility.metadata import Metadata
-from avdc.utility.metadata import ActressInfo
 from avdc.utility.misc import parseVID, concurrentMap
 from server import app
 from server import db_operator
@@ -39,8 +39,8 @@ def is_valid_metadata(_m: Any) -> bool:
     return isinstance(_m, Metadata)
 
 
-def is_valid_actress(_i: Any) -> bool:
-    return isinstance(_i, ActressInfo)
+def is_valid_actress(_a: Any) -> bool:
+    return isinstance(_a, Actress)
 
 
 def str_to_bool(s: str) -> bool:
@@ -132,27 +132,27 @@ def GetMetadataByVID(vid: str, update: bool = False) -> Optional[Metadata]:
     return m
 
 
-def GetActressByName(name: str, update: bool = False) -> Optional[ActressInfo]:
+def GetActressByName(name: str, update: bool = False) -> Optional[Actress]:
     if not update:
-        info = db_operator.GetActressByName(name)
-        if is_valid_actress(info):
-            return info
+        actress = db_operator.GetActressByName(name)
+        if is_valid_actress(actress):
+            return actress
 
     images = gfriends.search(name)
     if not images:
         return
 
-    info = xslist.main(name)
-    if not is_valid_actress(info):
-        info = ActressInfo(name=name)
+    actress = xslist.main(name)
+    if not is_valid_actress(actress):
+        actress = Actress(name=name)
 
     # attach images
-    info.images = images
+    actress.images = images
 
     # store to database
-    db_operator.StoreActress(info=info, update=update)
+    db_operator.StoreActress(actress=actress, update=update)
     app.logger.info(f'store {name} images to database')
-    return info
+    return actress
 
 
 def _getCoverImageByVID(vid: str, update: bool = False) -> Optional[tuple[str, bytes]]:

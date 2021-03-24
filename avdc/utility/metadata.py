@@ -109,7 +109,7 @@ class Metadata:
                 if not k.startswith('_')}
 
 
-class ActressInfo:
+class Actress:
 
     def __init__(self,
                  name: str,
