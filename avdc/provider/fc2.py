@@ -65,14 +65,15 @@ def main(keyword: str) -> Metadata:
     url = f'https://adult.contents.fc2.com/article/{keyword}/'
     text = get_html(url)
 
-    if 'The product you were looking for was not found.' in text:
+    if 'The product you were looking for was not found.' in text \
+            or 'ご指定のファイルが見つかりませんでした' in text:
         raise NotFound(f'fc2: {keyword} not found')
 
     return Metadata({
         'title': getTitle(text),
         'studio': getStudio(text),
         'overview': '',  # getOverview(text),
-        'runtime': '',
+        'runtime': 0,
         'director': getStudio(text),
         'actresses': getActresses(text),
         'release': getRelease(text),
@@ -89,4 +90,4 @@ def main(keyword: str) -> Metadata:
 
 if __name__ == '__main__':
     # print(main('FC2-1603395'))
-    print(main('FC2PPV-1603395'))
+    print(main('FC2PPV-1734831'))

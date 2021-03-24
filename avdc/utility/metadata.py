@@ -85,7 +85,7 @@ class Metadata:
 
     def _get_runtime(self) -> int:
         try:
-            return int(self._get('runtime'))
+            return int(self._get('runtime', 0))
         except ValueError:
             return 0
 
