@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Iterable
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any, Optional, Union
 
 
@@ -113,10 +113,10 @@ class Actress:
 
     def __init__(self,
                  name: str,
-                 birthday: Optional[str] = None,
+                 birthday: Optional[Union[str, date]] = None,
                  measurements: Optional[str] = None,
                  cup_size: Optional[str] = None,
-                 av_activity: Optional[str] = None,
+                 av_activity: Optional[Union[str, date]] = None,
                  sign: Optional[str] = None,
                  blood_type: Optional[str] = None,
                  height: Optional[str] = None,
@@ -137,12 +137,18 @@ class Actress:
         return self.toJSON()
 
     @staticmethod
-    def parseDate(date) -> Optional[str]:
+    def parseDate(d: Union[str, date]) -> Optional[str]:
+        if isinstance(d, date):
+            return str(d)
+
         for fmt in ('%Y年%m月%d日', '%Y年%m月', '%Y年',
+                    '%Y-%m-%d', '%Y/%m/%d',
                     '%A %d, %Y', '%A %Y', '%Y'):
             try:
-                return datetime.strptime(date, fmt).strftime('%Y-%m-%d')
-            except (TypeError, ValueError):
+                return datetime.strptime(d, fmt).strftime('%Y-%m-%d')
+            except TypeError:
+                break
+            except ValueError:
                 continue
 
     def toDict(self) -> dict:
