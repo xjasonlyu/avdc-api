@@ -6,10 +6,6 @@ from datetime import date, datetime
 from typing import Any, Optional, Union
 
 
-class MetadataError(Exception):
-    pass
-
-
 class Metadata:
 
     def __init__(self, raw: dict[str, Any]):
@@ -42,11 +38,11 @@ class Metadata:
         self.website: list[str] = self._to_list(self._get('website'))
 
         if not self.vid:
-            raise MetadataError('metadata missing vid')
+            raise ValueError('metadata missing vid')
         if not self.title:
-            raise MetadataError('metadata missing title')
+            raise ValueError('metadata missing title')
         if not self.cover:
-            raise MetadataError('metadata missing cover')
+            raise ValueError('metadata missing cover')
 
     def __eq__(self, m) -> bool:
         if not isinstance(m, Metadata):
