@@ -56,9 +56,11 @@ def getOverview(lx: html.HtmlElement) -> str:
 
 def getActresses(data: hash) -> list[str]:
     if "出演者" in data:
-        return get_anchor_info(data["出演者"]).split(",")
-    else:
-        return []
+        result = [i.strip() for i in get_anchor_info(data["出演者"]).split(",") if i.strip()]
+        return result if result else \
+            [i.strip() for i in data['出演者'].split(':')[-1].split() if i.strip()]
+
+    return []
 
 
 def getLabel(data: hash) -> str:
@@ -171,4 +173,4 @@ def main(keyword: str) -> Metadata:
 
 if __name__ == '__main__':
     # print(main('miae-003'))
-    print(main('ABP-110'))
+    print(main('ABW-073'))
