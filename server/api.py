@@ -50,6 +50,14 @@ def str_to_bool(s: str) -> bool:
         return False
 
 
+_s_list = ('ara', 'bnjc', 'dcv', 'endx', 'eva', 'ezd', 'gana',
+           'HAMENETS', 'hmdn', 'hoi', 'imdk', 'ion', 'jac',
+           'jkz', 'jotk', 'ksko', 'lafbd', 'luxu', 'maan',
+           'mium', 'mntj', 'nama', 'ntk', 'nttr', 'obut',
+           'ore', 'orebms', 'orec', 'orerb', 'oretd', 'orex',
+           'per', 'pkjd', 'scp', 'scute', 'cute', 'shyn', 'simm',
+           'siro', 'srcn', 'sqb', 'sweet', 'svmm', 'urf')
+
 _functions = {
     'avsox': avsox.main,
     'fanza': fanza.main,
@@ -74,7 +82,7 @@ def _getSources(keyword: str) -> list[str]:
     #     sources.insert(0, sources.pop(sources.index("avsox")))
 
     if "mgstage" in sources and (re.match(r"\d+[a-zA-Z]+", keyword) or
-                                 "SIRO" in keyword.upper()):
+                                 [i for i in _s_list if i.upper() in keyword.upper()]):
         sources.insert(0, sources.pop(sources.index("mgstage")))
 
     if "fc2" in sources and "FC2" in keyword.upper():
