@@ -54,7 +54,7 @@ def getOverview(lx: html.HtmlElement) -> str:
     return result[0] if result else ''
 
 
-def getActresses(data: hash) -> list[str]:
+def getActresses(data: dict) -> list[str]:
     if "出演者" in data:
         result = [i.strip() for i in get_anchor_info(data["出演者"]).split(",") if i.strip()]
         return result if result else \
@@ -63,56 +63,56 @@ def getActresses(data: hash) -> list[str]:
     return []
 
 
-def getLabel(data: hash) -> str:
+def getLabel(data: dict) -> str:
     if "メーカー" in data:
         return get_anchor_info(data["メーカー"])
     else:
         return ""
 
 
-def getGenres(data: hash) -> list[str]:
+def getGenres(data: dict) -> list[str]:
     if "ジャンル" in data:
         return get_anchor_info(data["ジャンル"]).split(",")
     else:
         return []
 
 
-def getStudio(data: hash) -> str:
+def getStudio(data: dict) -> str:
     if "メーカー" in data:
         return get_anchor_info(data["メーカー"])
     else:
         return ""
 
 
-def getVID(data: hash) -> str:
+def getVID(data: dict) -> str:
     if "品番" in data:
         return get_text_info(data["品番"])
     else:
         return ""
 
 
-def getRelease(data: hash) -> str:
+def getRelease(data: dict) -> str:
     if "配信開始日" in data:
         return get_text_info(data["配信開始日"])
     else:
         return ""
 
 
-def getRuntime(data: hash) -> str:
+def getRuntime(data: dict) -> str:
     if "収録時間" in data:
         return get_text_info(data["収録時間"]).rstrip("minutes").strip()
     else:
         return ""
 
 
-# def getYear(data: hash) -> str:
+# def getYear(data: dict) -> str:
 #     if "release" in data:
 #         return data["release"][:4]
 #     else:
 #         return ""
 
 
-def getSeries(data: hash) -> str:
+def getSeries(data: dict) -> str:
     if "シリーズ" in data:
         return get_anchor_info(data["シリーズ"])
     else:
