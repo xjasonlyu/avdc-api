@@ -162,7 +162,7 @@ def _getCoverImageByVID(vid: str, update: bool = False) -> Optional[tuple[str, b
             return result  # format, data
 
     m = GetMetadataByVID(vid)
-    if not m:
+    if not is_valid_metadata(m) or not m.cover:
         return
 
     data = getRawImageByURL(m.cover)
