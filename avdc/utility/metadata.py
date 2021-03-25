@@ -41,7 +41,7 @@ class Actress:
 
         for fmt in ('%Y年%m月%d日', '%Y年%m月', '%Y年',
                     '%Y-%m-%d', '%Y/%m/%d',
-                    '%A %d, %Y', '%A %Y', '%Y'):
+                    '%B %d, %Y', '%B %Y', '%Y'):
             try:
                 return datetime.strptime(d, fmt).strftime('%Y-%m-%d')
             except TypeError:
