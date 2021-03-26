@@ -71,7 +71,7 @@ _functions = {
     'dlsite': dlsite.main,
 }
 
-_priority = 'javbus+jav321,mgstage,avsox,javdb,fanza,xcity,dlsite,javlib,fc2'
+_priority = 'javbus+jav321,mgstage,avsox,javdb,fanza,xcity,dlsite,fc2'
 
 
 def _getSources(keyword: str) -> list[str]:
