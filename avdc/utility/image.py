@@ -3,7 +3,7 @@ from io import BytesIO
 from typing import Optional
 
 import numpy as np
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from face_recognition import face_locations
 
 from avdc.utility.httpclient import get_blob
@@ -14,14 +14,18 @@ def getRawImageByURL(url: str) -> bytes:
 
 
 def getRawImageFormat(data: bytes) -> Optional[str]:
-    # try:
-    #     im: Image.Image = Image.open(BytesIO(data))
-    # except UnidentifiedImageError:
-    #     return
-    # else:
-    #     return im.format
     with BytesIO(data) as f:
-        return imghdr.what(f)
+        fmt = imghdr.what(f)
+
+        if fmt is None:  # fallback
+            try:
+                im: Image.Image = Image.open(f)
+            except UnidentifiedImageError:
+                pass
+            else:
+                fmt = im.format
+
+    return fmt.lower() if isinstance(fmt, str) else None
 
 
 def getImageSize(img: np.ndarray) -> tuple[int, int]:
