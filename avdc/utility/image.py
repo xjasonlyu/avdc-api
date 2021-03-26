@@ -87,9 +87,8 @@ def cropImage(img: np.ndarray,
         left, right = width - _width, width
         return img[:, left:right]
 
-    x = center - (_width // 2)
-    left = x if x > 0 else 0
-    right = min(left + _width, width)
+    left = min(max(0, center - (_width // 2)), width - _width)
+    right = left + _width
     return img[:, left:right]
 
 
@@ -112,6 +111,6 @@ def autoCropImage(img: np.ndarray, face_detection: bool = True, pos: float = -1,
 
 if __name__ == '__main__':
     i = getRawImageByURL('https://pics.javbus.com/cover/7zjh_b.jpg')
-    j = autoCropImage(bytesToImage(i), pos=0.1)
+    j = autoCropImage(bytesToImage(i), pos=0)
     Image.fromarray(j).show()
     # print(getRawImageFormat(i))
