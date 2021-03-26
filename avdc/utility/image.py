@@ -93,9 +93,11 @@ def cropImage(img: np.ndarray,
     return img[:, left:right]
 
 
-def autoCropImage(img: np.ndarray, face_detection: bool = True, **options) -> np.ndarray:
-    if not face_detection:
-        return cropImage(img, **options)
+def autoCropImage(img: np.ndarray, face_detection: bool = True, pos: float = -1, **options) -> np.ndarray:
+    if not face_detection or 0 <= pos <= 1:
+        return cropImage(img,
+                         center=int(pos * getImageSize(img)[1]),
+                         **options)
 
     # find and sort faces
     faces = findFaces(img)
@@ -108,8 +110,7 @@ def autoCropImage(img: np.ndarray, face_detection: bool = True, **options) -> np
 
 
 if __name__ == '__main__':
-    i = getRawImageByURL('https://imgix.pedestrian.tv/content/uploads/2021/01/14/'
-                         'Ted-Mosby.jpg?ar=16%3A9&auto=format&crop=focal&fit=crop&q=65&w=1200')
-    j = autoCropImage(bytesToImage(i), default_to_right=False)
+    i = getRawImageByURL('https://pics.javbus.com/cover/7zjh_b.jpg')
+    j = autoCropImage(bytesToImage(i), pos=0.1)
     Image.fromarray(j).show()
     # print(getRawImageFormat(i))
