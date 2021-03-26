@@ -175,7 +175,9 @@ def _getCoverImageByVID(vid: str, update: bool = False) -> Optional[tuple[str, b
 
     data = getRawImageByURL(m.cover)
     fmt = getRawImageFormat(data)
-    assert fmt is not None
+
+    if fmt is None:
+        raise Exception(f'{m.vid}: cover image format detection failed')
 
     db_operator.StoreCover(m.vid, data, fmt, update=update)
     return fmt, data
