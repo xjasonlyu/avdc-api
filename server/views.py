@@ -89,11 +89,15 @@ def _actress_image(name: str, index: int = 0):
 def _metadata(vid: str, _: bool):
     update = api.str_to_bool(
         request.args.get('update'))
+    pos = request.args.get('pos', type=float)
 
     m = api.GetMetadataByVID(vid, update=update)
     if not m:
         return jsonify(status=False,
                        message=f'metadata not found: {vid}'), HTTPStatus.NOT_FOUND
+
+    if pos is not None:
+        api.UpdateCoverPositionByVID(m, pos)
 
     return jsonify(m.toDict())
 

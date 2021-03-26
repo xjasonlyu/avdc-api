@@ -163,6 +163,21 @@ def GetActressByName(name: str, update: bool = False) -> Optional[Actress]:
     return actress
 
 
+def UpdateCoverPositionByVID(m: Metadata, pos: float):
+    pos = pos if 0 <= pos <= 1 else -1
+
+    result = db_operator.GetCoverByVID(m.vid)
+    if not result:
+        data = getRawImageByURL(m.cover)
+        fmt = getRawImageFormat(data)
+    else:
+        if abs(result[2] - pos) < 0.01:  # almost equal
+            return
+        fmt, data = result[:2]
+
+    db_operator.StoreCover(m.vid, data, fmt, pos=pos, update=True)
+
+
 def _getCoverImageByVID(vid: str, update: bool = False) -> Optional[tuple[str, bytes, float]]:
     if not update:
         result = db_operator.GetCoverByVID(vid)
