@@ -163,11 +163,11 @@ def GetActressByName(name: str, update: bool = False) -> Optional[Actress]:
     return actress
 
 
-def _getCoverImageByVID(vid: str, update: bool = False) -> Optional[tuple[str, bytes]]:
+def _getCoverImageByVID(vid: str, update: bool = False) -> Optional[tuple[str, bytes, float]]:
     if not update:
         result = db_operator.GetCoverByVID(vid)
         if result:
-            return result  # format, data
+            return result  # format, data, pos
 
     m = GetMetadataByVID(vid)
     if not is_valid_metadata(m) or not m.cover:
@@ -180,10 +180,10 @@ def _getCoverImageByVID(vid: str, update: bool = False) -> Optional[tuple[str, b
         raise Exception(f'{m.vid}: cover image format detection failed')
 
     db_operator.StoreCover(m.vid, data, fmt, update=update)
-    return fmt, data
+    return fmt, data, -1
 
 
-def GetBackdropImageByVID(vid: str, *args, **kwargs) -> Optional[tuple[str, bytes]]:
+def GetBackdropImageByVID(vid: str, *args, **kwargs) -> Optional[tuple[str, bytes, float]]:
     return _getCoverImageByVID(vid, *args, **kwargs)
 
 
@@ -192,8 +192,8 @@ def GetPrimaryImageByVID(vid: str, *args, **kwargs) -> Optional[bytes]:
     if not result:
         return
 
-    _, data = result
-    return imageToBytes(autoCropImage(bytesToImage(data)))
+    _, data, pos = result
+    return imageToBytes(autoCropImage(bytesToImage(data), pos=pos))
 
 
 if __name__ == '__main__':

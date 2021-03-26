@@ -105,7 +105,7 @@ def _backdrop_image(vid: str, _: bool):
     if not result:
         return jsonify(status=False,
                        message=f'backdrop image not found: {vid}'), HTTPStatus.NOT_FOUND
-    fmt, data = result
+    fmt, data, _ = result
     return Response(data, mimetype=f'image/{fmt}')
 
 

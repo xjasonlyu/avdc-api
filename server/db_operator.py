@@ -41,7 +41,7 @@ def StoreActress(actress: _A, update: bool = False):
      .execute())
 
 
-def GetCoverByVID(vid: str) -> Optional[tuple[str, bytes]]:
+def GetCoverByVID(vid: str) -> Optional[tuple[str, bytes, float]]:
     vid = vid.upper()
     try:
         result: Cover = Cover.get((Cover.vid == vid) |
@@ -49,13 +49,14 @@ def GetCoverByVID(vid: str) -> Optional[tuple[str, bytes]]:
                                   (Cover.vid == vid.replace('_', '-')))
     except DoesNotExist:
         return
-    return result.format, result.data
+    return result.format, result.data, result.pos
 
 
-def StoreCover(vid: str, data: bytes, fmt: Optional[str] = None, update: bool = False):
+def StoreCover(vid: str, data: bytes, fmt: Optional[str] = None, pos: float = -1, update: bool = False):
     (Cover
      .insert(vid=vid,
              data=data,
-             format=fmt or getRawImageFormat(data))
+             format=fmt or getRawImageFormat(data),
+             pos=pos)
      .on_conflict('REPLACE' if update else 'IGNORE')
      .execute())

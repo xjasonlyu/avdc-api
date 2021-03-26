@@ -78,6 +78,7 @@ class Cover(BasicModel):
     vid = CharField(primary_key=True, unique=True)
     format = CharField()
     data = BlobField()
+    pos = DoubleField(default=-1)
 
 
 if __name__ == '__main__':
