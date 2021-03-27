@@ -74,6 +74,10 @@ _functions = {
 _priority = 'javbus+jav321,mgstage,avsox,javdb,fanza,xcity,dlsite,fc2'
 
 
+def _is_in_s_list(keyword: str) -> bool:
+    return True if [i for i in _s_list if i.upper() in keyword.upper()] else False
+
+
 def _getSources(keyword: str) -> list[str]:
     sources = _priority.split(',')  # default priority
 
@@ -82,7 +86,7 @@ def _getSources(keyword: str) -> list[str]:
     #     sources.insert(0, sources.pop(sources.index("avsox")))
 
     if "mgstage" in sources and (re.match(r"\d+[a-zA-Z]+", keyword) or
-                                 [i for i in _s_list if i.upper() in keyword.upper()]):
+                                 _is_in_s_list(keyword)):
         sources.insert(0, sources.pop(sources.index("mgstage")))
 
     if "fc2" in sources and "FC2" in keyword.upper():
@@ -207,8 +211,15 @@ def GetPrimaryImageByVID(vid: str, *args, **kwargs) -> Optional[bytes]:
     if not result:
         return
 
+    face_detection = False  # disabled by default
+    if re.match(r'^\d+[\-_]\d+', vid, re.IGNORECASE) \
+            or re.match(r'^n\d+', vid, re.IGNORECASE) \
+            or [i for i in ('HEYZO', 'BD', 'HD', '3D') if i in vid.upper()] \
+            or _is_in_s_list(vid):
+        face_detection = True
+
     _, data, pos = result
-    return imageToBytes(autoCropImage(bytesToImage(data), pos=pos))
+    return imageToBytes(autoCropImage(bytesToImage(data), pos=pos, face_detection=face_detection))
 
 
 if __name__ == '__main__':
