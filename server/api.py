@@ -214,7 +214,7 @@ def GetPrimaryImageByVID(vid: str, *args, **kwargs) -> Optional[bytes]:
     face_detection = False  # disabled by default
     if re.match(r'^\d+[\-_]\d+', vid, re.IGNORECASE) \
             or re.match(r'^n\d+', vid, re.IGNORECASE) \
-            or [i for i in ('HEYZO', 'BD', 'HD', '3D') if i in vid.upper()] \
+            or [i for i in ('HEYZO', 'BD', 'HD', '3D', 'MSFH') if i in vid.upper()] \
             or _is_in_s_list(vid):
         face_detection = True
 
