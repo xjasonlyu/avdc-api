@@ -17,6 +17,7 @@ from avdc.provider import mgstage
 from avdc.provider import xcity
 from avdc.utility.image import (cropImage,
                                 autoCropImage,
+                                getImageSize,
                                 getRawImageByURL,
                                 getRawImageFormat,
                                 imageToBytes,
@@ -231,6 +232,15 @@ def GetThumbImageByVID(vid: str, *args, **kwargs) -> Optional[bytes]:
 
     _, data, _ = result
     return imageToBytes(cropImage(bytesToImage(data), scale=16 / 9, default_to_top=False))
+
+
+def GetBackdropImageSizeByVID(vid: str, *args, **kwargs) -> Optional[tuple[int, int]]:
+    result = _getCoverImageByVID(vid, *args, **kwargs)
+    if not result:
+        return
+
+    _, data, _ = result
+    return getImageSize(bytesToImage(data))  # height, width
 
 
 if __name__ == '__main__':
