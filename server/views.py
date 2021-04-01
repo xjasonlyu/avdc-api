@@ -161,4 +161,13 @@ def _actress_image_info(name: str, index: int = 0):
                        message=f'index out of range: {index}: {name}'), HTTPStatus.NOT_FOUND
 
     height, width = image.getRemoteImageSizeByURL(url)
+
+    scale = 2 / 3
+    _width = int(height * scale)
+
+    if _width >= width:
+        height = int(width / scale)
+    else:
+        width = _width
+
     return jsonify(height=height, width=width)  # only size info for now
