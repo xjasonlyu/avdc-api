@@ -29,10 +29,10 @@ from server import app
 from server import db_operator
 
 
-def extract_vid(fn: Callable[[str, bool], Any]):
+def extract_vid(fn: Callable[[str], Any]):
     @wraps(fn)
     def wrapper(vid: str):
-        return fn(*parseVID(vid))
+        return fn(parseVID(vid)[0])
 
     return wrapper
 

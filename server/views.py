@@ -86,7 +86,7 @@ def _actress_image(name: str, index: int = 0):
 
 @app.route('/metadata/<vid>')
 @api.extract_vid
-def _metadata(vid: str, _: bool):
+def _metadata(vid: str):
     update = api.str_to_bool(
         request.args.get('update'))
     pos = request.args.get('pos', type=float)
@@ -104,7 +104,7 @@ def _metadata(vid: str, _: bool):
 
 @app.route('/image/backdrop/<vid>')
 @api.extract_vid
-def _backdrop_image(vid: str, _: bool):
+def _backdrop_image(vid: str):
     result = api.GetBackdropImageByVID(vid)
     if not result:
         return jsonify(status=False,
@@ -115,7 +115,7 @@ def _backdrop_image(vid: str, _: bool):
 
 @app.route('/image/primary/<vid>')
 @api.extract_vid
-def _primary_image(vid: str, _: bool):
+def _primary_image(vid: str):
     # dynamic generate primary image
     data = api.GetPrimaryImageByVID(vid)
     if not data:
@@ -126,7 +126,7 @@ def _primary_image(vid: str, _: bool):
 
 @app.route('/image/thumb/<vid>')
 @api.extract_vid
-def _thumb_image(vid: str, _: bool):
+def _thumb_image(vid: str):
     # dynamic generate thumb image
     data = api.GetThumbImageByVID(vid)
     if not data:
@@ -137,7 +137,7 @@ def _thumb_image(vid: str, _: bool):
 
 @app.route('/imageinfo/backdrop/<vid>')
 @api.extract_vid
-def _backdrop_image_info(vid: str, _: bool):
+def _backdrop_image_info(vid: str):
     data = api.GetBackdropImageSizeByVID(vid)
     if not data:
         return jsonify(status=False,
