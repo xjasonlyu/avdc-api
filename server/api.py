@@ -15,7 +15,8 @@ from avdc.provider import javdb
 from avdc.provider import javlib
 from avdc.provider import mgstage
 from avdc.provider import xcity
-from avdc.utility.image import (autoCropImage,
+from avdc.utility.image import (cropImage,
+                                autoCropImage,
                                 getRawImageByURL,
                                 getRawImageFormat,
                                 imageToBytes,
@@ -221,6 +222,15 @@ def GetPrimaryImageByVID(vid: str, *args, **kwargs) -> Optional[bytes]:
 
     _, data, pos = result
     return imageToBytes(autoCropImage(bytesToImage(data), pos=pos, face_detection=face_detection))
+
+
+def GetThumbImageByVID(vid: str, *args, **kwargs) -> Optional[bytes]:
+    result = _getCoverImageByVID(vid, *args, **kwargs)
+    if not result:
+        return
+
+    _, data, _ = result
+    return imageToBytes(cropImage(bytesToImage(data), scale=16 / 9, default_to_top=False))
 
 
 if __name__ == '__main__':

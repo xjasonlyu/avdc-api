@@ -68,7 +68,8 @@ def cropImage(img: np.ndarray,
               center: int = -1,
               scale: float = 2 / 3,
               tolerance: float = 0.01,
-              default_to_right: bool = True) -> np.ndarray:
+              default_to_right: bool = True,
+              default_to_top: bool = True) -> np.ndarray:
     height, width = getImageSize(img)
     # expected width
     _width = int(height * scale)
@@ -78,9 +79,13 @@ def cropImage(img: np.ndarray,
             # no need to crop
             return img
 
-        height = int(width / scale)
-        # just fit to top
-        return img[:min(height, height), :]
+        _height = int(width / scale)
+
+        if default_to_top:
+            return img[:min(height, _height), :]
+        else:  # fit to center
+            x = abs(height - _height) // 2
+            return img[x:height - x, :]
 
     # default to right side
     if center < 0 or (center > width // 2 and default_to_right):
@@ -111,6 +116,6 @@ def autoCropImage(img: np.ndarray, face_detection: bool = True, pos: float = -1,
 
 if __name__ == '__main__':
     i = getRawImageByURL('https://pics.javbus.com/cover/7zjh_b.jpg')
-    j = autoCropImage(bytesToImage(i), pos=0)
+    j = autoCropImage(bytesToImage(i), face_detection=False, scale=16 / 9, default_to_top=False)
     Image.fromarray(j).show()
     # print(getRawImageFormat(i))

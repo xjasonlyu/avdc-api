@@ -122,3 +122,14 @@ def _primary_image(vid: str, _: bool):
         return jsonify(status=False,
                        message=f'primary image not found: {vid}'), HTTPStatus.NOT_FOUND
     return Response(data, mimetype=f'image/jpeg')
+
+
+@app.route('/image/thumb/<vid>')
+@api.extract_vid
+def _thumb_image(vid: str, _: bool):
+    # dynamic generate thumb image
+    data = api.GetThumbImageByVID(vid)
+    if not data:
+        return jsonify(status=False,
+                       message=f'thumb image not found: {vid}'), HTTPStatus.NOT_FOUND
+    return Response(data, mimetype=f'image/jpeg')

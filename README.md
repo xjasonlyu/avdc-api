@@ -42,6 +42,7 @@ API 版本
 | `/metadata/<vid>` | 获取影片的元数据 |
 | `/image/actress/<name>` | 获取`2:3`比例的女优头像 |
 | `/image/primary/<vid>` | 获取`2:3`比例的海报封面 |
+| `/image/thumb/<vid>` | 获取`16:9`比例的海报封面 |
 | `/image/backdrop/<vid>` | 获取原影片全尺寸的封面 |
 
 ## 申明
