@@ -4,9 +4,19 @@ from typing import Optional
 
 import numpy as np
 from PIL import Image, UnidentifiedImageError
+from cachetools import cached, TTLCache
 from face_recognition import face_locations
 
-from avdc.utility.httpclient import get_blob
+from avdc.utility.httpclient import get_blob, Session, ResponseStream
+from avdc.utility.imagesize import getSize
+
+
+@cached(cache=TTLCache(maxsize=1000, ttl=7200))
+def getRemoteImageSizeByURL(url: str) -> tuple[int, int]:
+    with Session() as session:
+        r = session.get(url, stream=True)
+        stream = ResponseStream(r.iter_content(chunk_size=64))
+        return getSize(stream)[::-1]  # height, width
 
 
 def getRawImageByURL(url: str) -> bytes:

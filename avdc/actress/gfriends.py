@@ -4,8 +4,8 @@ from urllib.parse import quote
 
 from cachetools import cached, TTLCache
 
-from avdc.utility.httpclient import get_html, Session, ResponseStream
-from avdc.utility.imagesize import getSize
+from avdc.utility.httpclient import get_html
+from avdc.utility.image import getRemoteImageSizeByURL
 from avdc.utility.misc import concurrentMap
 
 REPO = 'xinxin8816/gfriends'
@@ -17,13 +17,6 @@ REPO_RAW_URL = f'https://raw.githubusercontent.com/{REPO}/master'
 def _getIndex() -> dict:
     url = f'{REPO_RAW_URL}/Filetree.json'
     return json.loads(get_html(url, raise_for_status=True))
-
-
-def getImageSize(url: str) -> tuple[int, int]:
-    with Session() as session:
-        r = session.get(url, stream=True)
-        stream = ResponseStream(r.iter_content(chunk_size=64))
-        return getSize(stream)  # width, height
 
 
 def search(name: str) -> list[str]:
@@ -38,9 +31,9 @@ def search(name: str) -> list[str]:
 
     results = list(result_set)
     if results:  # auto sort by height and width
-        sizes = concurrentMap(getImageSize, results, max_workers=len(results))
+        sizes = concurrentMap(getRemoteImageSizeByURL, results, max_workers=len(results))
         results = [i for _, i in sorted(zip(sizes, results),
-                                        key=lambda x: (x[0][1], x[0][0]), reverse=True)]
+                                        key=lambda x: (x[0][0], x[0][1]), reverse=True)]
     return results
 
 

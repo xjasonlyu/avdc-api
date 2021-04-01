@@ -144,3 +144,21 @@ def _backdrop_image_info(vid: str):
                        message=f'backdrop image not found: {vid}'), HTTPStatus.NOT_FOUND
     height, width = data
     return jsonify(height=height, width=width)  # only size info for now
+
+
+@app.route('/imageinfo/actress/<name>')
+@app.route('/imageinfo/actress/<name>/<int:index>')
+def _actress_image_info(name: str, index: int = 0):
+    actress = api.GetActressByName(name)
+    if not actress or not actress.images:
+        return jsonify(status=False,
+                       message=f'actress image not found: {name}'), HTTPStatus.NOT_FOUND
+
+    try:
+        url = actress.images[index]
+    except IndexError:
+        return jsonify(status=False,
+                       message=f'index out of range: {index}: {name}'), HTTPStatus.NOT_FOUND
+
+    height, width = image.getRemoteImageSizeByURL(url)
+    return jsonify(height=height, width=width)  # only size info for now
