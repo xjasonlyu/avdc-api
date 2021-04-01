@@ -135,12 +135,12 @@ def _thumb_image(vid: str, _: bool):
     return Response(data, mimetype=f'image/jpeg')
 
 
-@app.route('/imagesize/backdrop/<vid>')
+@app.route('/imageinfo/backdrop/<vid>')
 @api.extract_vid
-def _backdrop_image_size(vid: str, _: bool):
+def _backdrop_image_info(vid: str, _: bool):
     data = api.GetBackdropImageSizeByVID(vid)
     if not data:
         return jsonify(status=False,
                        message=f'backdrop image not found: {vid}'), HTTPStatus.NOT_FOUND
     height, width = data
-    return jsonify(height=height, width=width)
+    return jsonify(height=height, width=width)  # only size info for now
