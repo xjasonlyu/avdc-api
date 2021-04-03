@@ -5,7 +5,7 @@ from peewee import DoesNotExist
 from avdc.utility.image import getRawImageFormat
 from avdc.utility.metadata import Actress as _A
 from avdc.utility.metadata import Metadata as _M
-from server.database import Metadata, Actress, Cover
+from server.database import Metadata, Actresses, Covers
 
 
 def GetMetadataByVID(vid: str) -> Optional[_M]:
@@ -28,14 +28,14 @@ def StoreMetadata(metadata: _M, update: bool = False):
 
 def GetActressByName(name: str) -> Optional[_A]:
     try:
-        result: Actress = Actress.get((Actress.name == name))
+        result: Actresses = Actresses.get((Actresses.name == name))
     except DoesNotExist:
         return
     return _A(**result.__data__)
 
 
 def StoreActress(actress: _A, update: bool = False):
-    (Actress
+    (Actresses
      .insert(**dict(actress))
      .on_conflict('REPLACE' if update else 'IGNORE')
      .execute())
@@ -44,16 +44,16 @@ def StoreActress(actress: _A, update: bool = False):
 def GetCoverByVID(vid: str) -> Optional[tuple[str, bytes, float]]:
     vid = vid.upper()
     try:
-        result: Cover = Cover.get((Cover.vid == vid) |
-                                  (Cover.vid == vid.replace('-', '_')) |
-                                  (Cover.vid == vid.replace('_', '-')))
+        result: Covers = Covers.get((Covers.vid == vid) |
+                                    (Covers.vid == vid.replace('-', '_')) |
+                                    (Covers.vid == vid.replace('_', '-')))
     except DoesNotExist:
         return
     return result.format, result.data, result.pos
 
 
 def StoreCover(vid: str, data: bytes, fmt: Optional[str] = None, pos: float = -1, update: bool = False):
-    (Cover
+    (Covers
      .insert(vid=vid,
              data=data,
              format=fmt or getRawImageFormat(data),
