@@ -60,7 +60,7 @@ def _actress(name: str):
     if not actress:
         return jsonify(status=False,
                        message=f'actress not found: {name}'), HTTPStatus.NOT_FOUND
-    return jsonify(actress.toDict())
+    return jsonify(dict(actress))
 
 
 @app.route('/image/actress/<name>')
@@ -99,7 +99,7 @@ def _metadata(vid: str):
     if pos is not None:
         api.UpdateCoverPositionByVID(m, pos)
 
-    return jsonify(m.toDict())
+    return jsonify(dict(m))
 
 
 @app.route('/image/backdrop/<vid>')

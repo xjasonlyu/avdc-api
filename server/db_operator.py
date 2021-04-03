@@ -21,7 +21,7 @@ def GetMetadataByVID(vid: str) -> Optional[_M]:
 
 def StoreMetadata(metadata: _M, update: bool = False):
     (Metadata
-     .insert(**metadata.toDict())
+     .insert(**dict(metadata))
      .on_conflict('REPLACE' if update else 'IGNORE')
      .execute())
 
@@ -36,7 +36,7 @@ def GetActressByName(name: str) -> Optional[_A]:
 
 def StoreActress(actress: _A, update: bool = False):
     (Actress
-     .insert(**actress.toDict())
+     .insert(**dict(actress))
      .on_conflict('REPLACE' if update else 'IGNORE')
      .execute())
 

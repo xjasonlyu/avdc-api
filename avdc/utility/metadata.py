@@ -1,6 +1,6 @@
 import json
 from datetime import date, datetime
-from typing import Any, Optional, Union
+from typing import Any, Iterator, Optional, Union
 
 
 class BaseMetadata:
@@ -23,11 +23,15 @@ class BaseMetadata:
     def __str__(self) -> str:
         return self.toJSON()
 
+    def __iter__(self) -> Iterator:
+        return ((k, v) for k, v in vars(self).items()
+                if not k.startswith('_'))
+
     def __eq__(self, other) -> bool:
         if not isinstance(other, self.__class__):
             return False
 
-        for k in self.toDict().keys():
+        for k in dict(self).keys():
             if getattr(self, k) != getattr(other, k):
                 return False
         return True
@@ -37,7 +41,7 @@ class BaseMetadata:
             raise TypeError(f'invalid type to add: {type(other)}')
 
         m = {}
-        for k, v in other.toDict().items():
+        for k, v in dict(other).items():
             if k in ('sources', 'providers'):
                 m[k] = self.get(k) + v
             else:
@@ -50,7 +54,7 @@ class BaseMetadata:
 
     def toJSON(self) -> str:
         return json.dumps(
-            self.toDict(),
+            dict(self),
             ensure_ascii=False,
             sort_keys=True,
             indent=4,
@@ -58,8 +62,7 @@ class BaseMetadata:
         )
 
     def toDict(self) -> dict:
-        return {k: v for k, v in vars(self).items()
-                if not k.startswith('_')}
+        return dict(self)
 
 
 class Actress(BaseMetadata):
