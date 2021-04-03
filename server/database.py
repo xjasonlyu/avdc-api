@@ -51,8 +51,8 @@ class Metadata(BasicModel):
     release = DateField()
 
     # source fields
-    sources = ArrayField()
     providers = ArrayField()
+    sources = ArrayField()
 
 
 class Actress(BasicModel):
@@ -70,8 +70,8 @@ class Actress(BasicModel):
     birthday = DateField(null=True)
 
     # source fields
-    sources = ArrayField(null=True)
     providers = ArrayField(null=True)
+    sources = ArrayField(null=True)
 
 
 class Cover(BasicModel):

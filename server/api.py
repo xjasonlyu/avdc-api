@@ -26,7 +26,7 @@ from avdc.utility.metadata import Actress
 from avdc.utility.metadata import Metadata
 from avdc.utility.misc import parseVID, concurrentMap
 from server import app
-from server import db_operator
+from server import db_api
 
 
 def extract_vid(fn: Callable[[str], Any]):
@@ -127,7 +127,7 @@ def _getRemoteMetadata(vid: str) -> Optional[Metadata]:
 
 
 def _getLocalMetadata(vid: str) -> Optional[Metadata]:
-    return db_operator.GetMetadataByVID(vid)
+    return db_api.GetMetadataByVID(vid)
 
 
 def GetMetadataByVID(vid: str, update: bool = False) -> Optional[Metadata]:
@@ -141,14 +141,14 @@ def GetMetadataByVID(vid: str, update: bool = False) -> Optional[Metadata]:
         return
 
     # store to database
-    db_operator.StoreMetadata(m, update=update)
+    db_api.StoreMetadata(m, update=update)
     app.logger.info(f'store {m.vid} to database')
     return m
 
 
 def GetActressByName(name: str, update: bool = False) -> Optional[Actress]:
     if not update:
-        actress = db_operator.GetActressByName(name)
+        actress = db_api.GetActressByName(name)
         if is_valid_actress(actress):
             return actress
 
@@ -164,7 +164,7 @@ def GetActressByName(name: str, update: bool = False) -> Optional[Actress]:
     actress.images = images
 
     # store to database
-    db_operator.StoreActress(actress=actress, update=update)
+    db_api.StoreActress(actress=actress, update=update)
     app.logger.info(f'store {name} images to database')
     return actress
 
@@ -172,7 +172,7 @@ def GetActressByName(name: str, update: bool = False) -> Optional[Actress]:
 def UpdateCoverPositionByVID(m: Metadata, pos: float):
     pos = pos if 0 <= pos <= 1 else -1
 
-    result = db_operator.GetCoverByVID(m.vid)
+    result = db_api.GetCoverByVID(m.vid)
     if not result:
         data = getRawImageByURL(m.cover)
         fmt = getRawImageFormat(data)
@@ -181,12 +181,12 @@ def UpdateCoverPositionByVID(m: Metadata, pos: float):
             return
         fmt, data = result[:2]
 
-    db_operator.StoreCover(m.vid, data, fmt, pos=pos, update=True)
+    db_api.StoreCover(m.vid, data, fmt, pos=pos, update=True)
 
 
 def _getCoverImageByVID(vid: str, update: bool = False) -> Optional[tuple[str, bytes, float]]:
     if not update:
-        result = db_operator.GetCoverByVID(vid)
+        result = db_api.GetCoverByVID(vid)
         if result:
             return result  # format, data, pos
 
@@ -200,7 +200,7 @@ def _getCoverImageByVID(vid: str, update: bool = False) -> Optional[tuple[str, b
     if fmt is None:
         raise Exception(f'{m.vid}: cover image format detection failed')
 
-    db_operator.StoreCover(m.vid, data, fmt, update=update)
+    db_api.StoreCover(m.vid, data, fmt, update=update)
     return fmt, data, -1
 
 
