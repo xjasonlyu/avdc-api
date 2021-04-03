@@ -55,7 +55,7 @@ def main(name: str):
         return
 
     text = get_html(url, raise_for_status=True)
-    return Actress(extractName(text), *extractInfo(text))
+    return Actress(extractName(text), *extractInfo(text), source=url)
 
 
 if __name__ == '__main__':

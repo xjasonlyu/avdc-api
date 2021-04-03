@@ -64,12 +64,14 @@ class Actress(BasicModel):
     name = CharField(primary_key=True, unique=True)
     images = ArrayField()
 
+    # nullable fields
     measurements = TextField(null=True)
     cup_size = TextField(null=True)
     sign = TextField(null=True)
     blood_type = TextField(null=True)
     height = TextField(null=True)
     nationality = TextField(null=True)
+    source = TextField(null=True)
     av_activity = DateField(null=True)
     birthday = DateField(null=True)
 

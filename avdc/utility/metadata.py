@@ -18,6 +18,7 @@ class Actress:
                  blood_type: Optional[str] = None,
                  height: Optional[str] = None,
                  nationality: Optional[str] = None,
+                 source: Optional[str] = None,
                  images: Optional[list[str]] = None):
         self.name = name
         self.birthday = self.parseDate(birthday)
@@ -27,6 +28,7 @@ class Actress:
         self.blood_type = blood_type
         self.height = height
         self.nationality = nationality
+        self.source = source
         self.images = images
         self.cup_size = cup_size.upper().removesuffix('CUP').strip() \
             if isinstance(cup_size, str) else None
