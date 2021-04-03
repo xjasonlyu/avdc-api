@@ -9,7 +9,7 @@ def concurrentMap(fn, *args, timeout=None, max_workers=None):
 
 
 def extractTitle(_s: str) -> str:
-    return re.sub(r'[a-zA-Z0-9]+[-_]?[a-zA-Z0-9]+[-_ ]', '', _s)
+    return re.sub(r'^[a-zA-Z0-9_\-]+? ', '', _s)
 
 
 def parseVID(name: str) -> tuple[str, bool]:
