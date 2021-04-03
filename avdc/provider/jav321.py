@@ -3,8 +3,8 @@ import re
 from bs4 import BeautifulSoup
 from lxml import html
 
+from avdc.model.metadata import Metadata
 from avdc.utility.httpclient import post
-from avdc.utility.metadata import Metadata
 
 
 def get_bold_text(h: str) -> str:

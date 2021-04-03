@@ -2,8 +2,8 @@ from typing import Optional
 
 from lxml import etree
 
+from avdc.model.actress import Actress
 from avdc.utility.httpclient import get_html
-from avdc.utility.metadata import Actress
 
 XSLIST_URL = 'https://xslist.org/'
 

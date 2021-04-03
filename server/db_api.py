@@ -2,9 +2,9 @@ from typing import Optional
 
 from peewee import DoesNotExist
 
+from avdc.model.actress import Actress as _A
+from avdc.model.metadata import Metadata as _M
 from avdc.utility.image import getRawImageFormat, getRawImageSize
-from avdc.utility.metadata import Actress as _A
-from avdc.utility.metadata import Metadata as _M
 from server.cover import Cover
 from server.database import Metadata, Actresses, Covers
 

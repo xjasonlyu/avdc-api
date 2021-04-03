@@ -6,8 +6,8 @@ import cloudscraper
 from bs4 import BeautifulSoup
 from lxml import html
 
+from avdc.model.metadata import Metadata
 from avdc.utility.httpclient import request
-from avdc.utility.metadata import Metadata
 
 
 def get_from_xpath(lx: html.HtmlElement, xpath: str) -> str:

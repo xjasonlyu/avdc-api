@@ -3,8 +3,8 @@ import re
 from bs4 import BeautifulSoup
 from lxml import etree
 
+from avdc.model.metadata import Metadata
 from avdc.utility.httpclient import get_html
-from avdc.utility.metadata import Metadata
 
 
 def getTitle(a: str) -> str:

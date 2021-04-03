@@ -3,9 +3,9 @@ from urllib.parse import urlencode
 
 from lxml import etree
 
+from avdc.model.metadata import Metadata
 from avdc.provider import NotFound
 from avdc.utility.httpclient import get_html
-from avdc.utility.metadata import Metadata
 from avdc.utility.misc import extractTitle
 
 

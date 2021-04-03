@@ -5,6 +5,8 @@ from typing import Any, Callable, Optional
 
 from avdc.actress import gfriends
 from avdc.actress import xslist
+from avdc.model.actress import Actress
+from avdc.model.metadata import Metadata
 from avdc.provider import avsox
 from avdc.provider import dlsite
 from avdc.provider import fanza
@@ -22,8 +24,6 @@ from avdc.utility.image import (cropImage,
                                 getRawImageFormat,
                                 imageToBytes,
                                 bytesToImage)
-from avdc.utility.metadata import Actress
-from avdc.utility.metadata import Metadata
 from avdc.utility.misc import parseVID, concurrentMap
 from server import app
 from server import db_api

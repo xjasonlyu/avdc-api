@@ -4,8 +4,8 @@ from bs4 import BeautifulSoup
 from lxml import etree
 from pyquery import PyQuery as pq
 
+from avdc.model.metadata import Metadata
 from avdc.utility.httpclient import get_html
-from avdc.utility.metadata import Metadata
 from avdc.utility.misc import concurrentMap, extractTitle
 
 
