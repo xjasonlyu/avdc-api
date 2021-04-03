@@ -1,15 +1,15 @@
 from peewee import *
 from playhouse.db_url import connect
 
-db_proxy = DatabaseProxy()
+db = DatabaseProxy()
 
 
 def database_init(url: str):
-    db = connect(url,
-                 field_types={'ARRAY': 'TEXT'})
-    db_proxy.initialize(db)
+    _db = connect(url,
+                  field_types={'ARRAY': 'TEXT'})
+    db.initialize(_db)
     # create table if not exist
-    db_proxy.create_tables([Metadata, Actresses, Covers])
+    db.create_tables([Metadata, Actresses, Covers])
 
 
 class LongBlobField(BlobField):
@@ -28,7 +28,7 @@ class ArrayField(TextField):
 
 class BasicModel(Model):
     class Meta:
-        database = db_proxy
+        database = db
 
 
 class Metadata(BasicModel):
