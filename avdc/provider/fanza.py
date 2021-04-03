@@ -235,7 +235,7 @@ def main(keyword: str) -> Metadata:
     # so get the hinban first, and then pass it to following functions
     fanza_hinban = getVID(text)
 
-    return Metadata({
+    return Metadata(**{
         'title': getTitle(text).strip(),
         'studio': getStudio(text),
         'overview': getOverview(text),

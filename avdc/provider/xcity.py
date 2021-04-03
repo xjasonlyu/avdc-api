@@ -155,7 +155,7 @@ def main(keyword: str) -> Metadata:
     urls = html.xpath("//table[contains(@class, 'resultList')]/tr[2]/td[1]/a/@href")[0]
     detail_page = get_html('https://xcity.jp' + urls)
 
-    return Metadata({
+    return Metadata(**{
         'actresses': getActresses(detail_page),
         'title': getTitle(detail_page),
         'studio': getStudio(detail_page),

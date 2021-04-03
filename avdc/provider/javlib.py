@@ -141,7 +141,7 @@ def main(keyword: str) -> Metadata:
             'series': '',
         }
 
-    return Metadata(metadata)
+    return Metadata(**metadata)
 
 
 if __name__ == '__main__':

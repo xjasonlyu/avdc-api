@@ -118,7 +118,7 @@ def main(keyword: str) -> Metadata:
     url = f'https://www.javbus.com/{vid}'
     text = get_html(url, raise_for_status=True)
 
-    return Metadata({
+    return Metadata(**{
         'title': getTitle(text),
         'studio': getStudio(text) or getPublisher(text),
         'overview': getOverview(text),

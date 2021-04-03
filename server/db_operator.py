@@ -16,7 +16,7 @@ def GetMetadataByVID(vid: str) -> Optional[_M]:
                                         (Metadata.vid == vid.replace('_', '-')))
     except DoesNotExist:
         return
-    return _M(result.__data__)
+    return _M(**result.__data__)
 
 
 def StoreMetadata(metadata: _M, update: bool = False):

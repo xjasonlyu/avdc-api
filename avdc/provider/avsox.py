@@ -105,7 +105,7 @@ def main(keyword: str) -> Metadata:
     soup = BeautifulSoup(text, 'lxml')
     info = str(soup.find(attrs={'class': 'row movie'}))
 
-    return Metadata({
+    return Metadata(**{
         'actresses': getActresses(text),
         'title': getTitle(text),
         'studio': getStudio(info),

@@ -1,12 +1,68 @@
-from __future__ import annotations
-
 import json
-from collections.abc import Iterable
 from datetime import date, datetime
 from typing import Any, Optional, Union
 
 
-class Actress:
+class BaseMetadata:
+
+    def __init__(self,
+                 source: Optional[str] = None,
+                 provider: Optional[str] = None,
+                 **kwargs):
+        self.sources: list[str] = kwargs.get('sources', [])
+        self.providers: list[str] = kwargs.get('providers', [])
+
+        if source:
+            assert isinstance(source, str)
+            self.sources.append(source)
+
+        if provider:
+            assert isinstance(provider, str)
+            self.providers.append(provider)
+
+    def __str__(self) -> str:
+        return self.toJSON()
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, self.__class__):
+            return False
+
+        for k in self.toDict().keys():
+            if getattr(self, k) != getattr(other, k):
+                return False
+        return True
+
+    def __add__(self, other):
+        if not isinstance(other, self.__class__):
+            raise TypeError(f'invalid type to add: {type(other)}')
+
+        m = {}
+        for k, v in other.toDict().items():
+            if k in ('sources', 'providers'):
+                m[k] = self.get(k) + v
+            else:
+                m[k] = self.get(k) or v
+
+        return self.__class__(**m)
+
+    def get(self, key: str, default: Any = None) -> Any:
+        return getattr(self, key, default)
+
+    def toJSON(self) -> str:
+        return json.dumps(
+            self.toDict(),
+            ensure_ascii=False,
+            sort_keys=True,
+            indent=4,
+            separators=(",", ": "),
+        )
+
+    def toDict(self) -> dict:
+        return {k: v for k, v in vars(self).items()
+                if not k.startswith('_')}
+
+
+class Actress(BaseMetadata):
 
     def __init__(self,
                  name: str,
@@ -18,8 +74,8 @@ class Actress:
                  blood_type: Optional[str] = None,
                  height: Optional[str] = None,
                  nationality: Optional[str] = None,
-                 source: Optional[str] = None,
-                 images: Optional[list[str]] = None):
+                 images: Optional[list[str]] = None,
+                 **kwargs):
         self.name = name
         self.birthday = self.parseDate(birthday)
         self.measurements = measurements
@@ -28,13 +84,11 @@ class Actress:
         self.blood_type = blood_type
         self.height = height
         self.nationality = nationality
-        self.source = source
         self.images = images
         self.cup_size = cup_size.upper().removesuffix('CUP').strip() \
             if isinstance(cup_size, str) else None
 
-    def __str__(self) -> str:
-        return self.toJSON()
+        super().__init__(**kwargs)
 
     @staticmethod
     def parseDate(d: Union[str, date]) -> Optional[str]:
@@ -51,24 +105,12 @@ class Actress:
             except ValueError:
                 continue
 
-    def toDict(self) -> dict:
-        return vars(self)
 
-    def toJSON(self) -> str:
-        return json.dumps(
-            self.toDict(),
-            ensure_ascii=False,
-            sort_keys=True,
-            indent=4,
-            separators=(",", ": "),
-        )
+class Metadata(BaseMetadata):
 
-
-class Metadata:
-
-    def __init__(self, raw: dict[str, Any]):
+    def __init__(self, **kwargs):
         # raw metadata
-        self._raw: dict[str, Any] = raw
+        self._raw: dict[str, Any] = kwargs
 
         # required fields
         self.vid: str = self._get('vid', '').strip().upper()
@@ -91,9 +133,7 @@ class Metadata:
         self.cover: str = self._get('cover', '')
         self.images: list[str] = self._get('images', [])
 
-        # source fields
-        self.sources: list[str] = self._to_list(self._get('source'))
-        self.providers: list[str] = self._to_list(self._get('provider'))
+        super().__init__(**kwargs)
 
         if not self.vid:
             raise ValueError('metadata missing vid')
@@ -101,39 +141,6 @@ class Metadata:
             raise ValueError('metadata missing title')
         if not self.cover:
             raise ValueError('metadata missing cover')
-
-    def __eq__(self, m) -> bool:
-        if not isinstance(m, Metadata):
-            return False
-        for k in vars(self).keys():
-            if getattr(self, k) != getattr(m, k):
-                return False
-        return True
-
-    def __str__(self) -> str:
-        return self.toJSON()
-
-    def __add__(self, other: Metadata) -> Metadata:
-        if not isinstance(other, Metadata):
-            raise TypeError(f'invalid type to add: {type(other)}')
-
-        m = {}
-        for k, v in other.toDict().items():
-            if k in ('sources', 'providers'):
-                m[k] = self.get(k) + v
-            else:
-                m[k] = self.get(k) or v
-
-        return Metadata(m)
-
-    @staticmethod
-    def _to_list(v: Union[str, list[str]]) -> list[str]:
-        if isinstance(v, str):
-            return [v]
-        elif isinstance(v, Iterable):
-            return [i for i in v]
-        else:
-            return []
 
     def _get(self, key: str, default: Any = None) -> Any:
         return self._raw.get(key) or default
@@ -144,30 +151,13 @@ class Metadata:
         except ValueError:
             return 0
 
-    def get(self, key: str, default: Any = None) -> Any:
-        if not hasattr(self, key):
-            return default
-        return getattr(self, key)
-
-    def toJSON(self) -> str:
-        return json.dumps(
-            self.toDict(),
-            ensure_ascii=False,
-            sort_keys=True,
-            indent=4,
-            separators=(",", ": "),
-        )
-
-    def toDict(self) -> dict:
-        return {k: v for k, v in vars(self).items()
-                if not k.startswith('_')}
-
 
 def test():
-    m1 = Metadata({'vid': '0', 'title': 't', 'cover': 'n', 'source': 'ss'})
-    m2 = Metadata({'vid': '0', 'title': 't', 'cover': 'n', 'source': 'ss'})
-    m3 = Metadata({'vid': '1', 'title': 't', 'cover': 'm', 'source': 'ss'})
-    m4 = Metadata({'vid': '0', 'title': 'tt', 'source': 'test', 'website': 'http'})
+    m1 = Metadata(**{'vid': '0', 'title': 't', 'cover': 'n', 'source': 'ss', 'provider': 'ab'})
+    m2 = Metadata(**{'vid': '0', 'title': 't', 'cover': 'n', 'source': 'ss', 'provider': 'ab'})
+    m3 = Metadata(**{'vid': '1', 'title': 't', 'cover': 'm', 'source': 'ss', 'provider': 'ab'})
+    m4 = Metadata(**{'vid': '0', 'title': 'tt', 'cover': 'k', 'source': 'test', 'provider': 'abc'})
+    # m5 = Metadata(**{'vid': '0', 'title': 'nn', 'cover': 'v', 'source': 'test2', 'provider': 'abcd'})
 
     assert m1 == m1 == m2
     assert m1 != m3 and m2 != m3

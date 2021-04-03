@@ -132,7 +132,7 @@ def main(keyword: str) -> Metadata:
                     cookies={'locale': 'zh-cn'},
                     raise_for_status=True)
 
-    return Metadata({
+    return Metadata(**{
         'actresses': getActresses(text),
         'title': getTitle(text),
         'studio': getStudio(text),

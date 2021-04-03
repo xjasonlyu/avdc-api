@@ -115,7 +115,7 @@ def main(keyword: str) -> Metadata:
     a = str(soup.find(attrs={'class': 'detail_data'}))
     b = str(soup.find(attrs={"id": "introduction"}))
 
-    return Metadata({
+    return Metadata(**{
         'title': getTitle(text),
         'studio': getStudio(a),
         'overview': getOverview(b),

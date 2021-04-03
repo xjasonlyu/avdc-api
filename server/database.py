@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from peewee import *
 from playhouse.db_url import connect
 
@@ -18,7 +16,7 @@ class ArrayField(Field):
     field_type = 'ARRAY'
 
     def db_value(self, value: list[str]) -> str:
-        return ','.join(v for v in value)
+        return ','.join(v for v in value) if value else ''
 
     def python_value(self, value: str) -> list[str]:
         return value.split(',') if value else []
@@ -33,6 +31,10 @@ class Metadata(BasicModel):
     vid = CharField(primary_key=True, unique=True)
     title = TextField()
 
+    # cast fields
+    director = TextField()
+    actresses = ArrayField()
+
     # info fields
     overview = TextField()
     genres = ArrayField()
@@ -41,23 +43,16 @@ class Metadata(BasicModel):
     series = TextField()
     runtime = IntegerField()
 
-    # cast fields
-    actresses = ArrayField()
-    director = TextField()
-
     # image fields
     cover = TextField()
     images = ArrayField()
 
-    # source fields
-    sources = ArrayField()
-    providers = ArrayField()
-
     # date fields
     release = DateField()
 
-    # datetime fields
-    last_modified = DateTimeField(default=datetime.now)
+    # source fields
+    sources = ArrayField()
+    providers = ArrayField()
 
 
 class Actress(BasicModel):
@@ -71,9 +66,12 @@ class Actress(BasicModel):
     blood_type = TextField(null=True)
     height = TextField(null=True)
     nationality = TextField(null=True)
-    source = TextField(null=True)
     av_activity = DateField(null=True)
     birthday = DateField(null=True)
+
+    # source fields
+    sources = ArrayField(null=True)
+    providers = ArrayField(null=True)
 
 
 class Cover(BasicModel):

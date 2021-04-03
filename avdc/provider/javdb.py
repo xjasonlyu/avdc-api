@@ -202,7 +202,7 @@ def main(keyword: str) -> Metadata:
         # remove duplicate title
         title = title.replace(vid, '').strip()
 
-    return Metadata({
+    return Metadata(**{
         'actresses': getActresses(detail_page),
         'title': title,
         'studio': getStudio(detail_page),

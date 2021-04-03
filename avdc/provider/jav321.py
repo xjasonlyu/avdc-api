@@ -168,7 +168,7 @@ def main(keyword: str) -> Metadata:
             'provider': 'jav321',
             **data,
         }
-    return Metadata(metadata)
+    return Metadata(**metadata)
 
 
 if __name__ == '__main__':

@@ -69,7 +69,7 @@ def main(keyword: str) -> Metadata:
             or 'ご指定のファイルが見つかりませんでした' in text:
         raise NotFound(f'fc2: {keyword} not found')
 
-    return Metadata({
+    return Metadata(**{
         'title': getTitle(text),
         'studio': getStudio(text),
         'overview': '',  # getOverview(text),
