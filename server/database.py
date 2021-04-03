@@ -1,17 +1,17 @@
 from datetime import datetime
 
 from peewee import *
+from playhouse.db_url import connect
 
-sqlite_db = SqliteDatabase(
-    None,
-    field_types={'ARRAY': 'TEXT'},
-)
+db_proxy = DatabaseProxy()
 
 
-def sqlite_db_init(db: str):
-    sqlite_db.init(database=db)
+def database_init(url: str):
+    db = connect(url,
+                 field_types={'ARRAY': 'TEXT'})
+    db_proxy.initialize(db)
     # create table if not exist
-    sqlite_db.create_tables([Metadata, Actress, Cover])
+    db_proxy.create_tables([Metadata, Actress, Cover])
 
 
 class ArrayField(Field):
@@ -26,7 +26,7 @@ class ArrayField(Field):
 
 class BasicModel(Model):
     class Meta:
-        database = sqlite_db
+        database = db_proxy
 
 
 class Metadata(BasicModel):
@@ -82,4 +82,4 @@ class Cover(BasicModel):
 
 
 if __name__ == '__main__':
-    sqlite_db_init('example.db')
+    database_init('sqlite:///:memory:')
