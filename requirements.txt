@@ -11,3 +11,4 @@ numpy
 face_recognition
 flask
 Werkzeug
+pymysql
