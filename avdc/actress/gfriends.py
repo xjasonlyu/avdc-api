@@ -25,7 +25,7 @@ def search(name: str) -> list[str]:
     result_set = set()
     for company in content.keys():
         for img in content[company]:
-            if name == splitext(img)[0]:
+            if name.lower() == splitext(img)[0].lower():
                 result_set.add('/'.join([REPO_RAW_URL, 'Content',
                                          quote(company), quote(content[company][img])]))
 
