@@ -6,6 +6,7 @@ from typing import Any, Callable, Optional
 from avdc.actress import gfriends
 from avdc.actress import xslist
 from avdc.model.actress import Actress
+from avdc.model.cover import Cover
 from avdc.model.metadata import Metadata
 from avdc.provider import avsox
 from avdc.provider import dlsite
@@ -27,7 +28,6 @@ from avdc.utility.image import (cropImage,
 from avdc.utility.misc import parseVID, concurrentMap
 from server import app
 from server import db_api
-from server.cover import Cover
 
 
 def extract_vid(fn: Callable[[str], Any]):
