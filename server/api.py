@@ -212,9 +212,13 @@ def GetBackdropImageByVID(vid: str, update: bool = False) -> Optional[Cover]:
 
 
 def GetPrimaryImageByVID(vid: str, *args, **kwargs) -> Optional[bytes]:
-    cover = GetBackdropImageByVID(vid, *args, **kwargs)
+    cover = db_api.GetCoverByVID(vid+'@primary')  # try primary
     if not cover:
-        return
+        cover = GetBackdropImageByVID(vid, *args, **kwargs)
+
+        # we gotta go...
+        if not cover:
+            return
 
     face_detection = False  # disabled by default
     if re.match(r'^\d+[\-_]\d+', vid, re.IGNORECASE) \
