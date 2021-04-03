@@ -62,7 +62,6 @@ class Actress(BasicModel):
     # nullable fields
     measurements = TextField(null=True)
     cup_size = TextField(null=True)
-    sign = TextField(null=True)
     blood_type = TextField(null=True)
     height = TextField(null=True)
     nationality = TextField(null=True)

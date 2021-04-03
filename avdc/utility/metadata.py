@@ -83,7 +83,7 @@ class Actress(BaseMetadata):
         self.birthday = self.parseDate(birthday)
         self.measurements = measurements
         self.av_activity = self.parseDate(av_activity)
-        self.sign = sign
+        _ = sign  # ignore
         self.blood_type = blood_type
         self.height = height
         self.nationality = nationality
