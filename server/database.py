@@ -12,7 +12,11 @@ def database_init(url: str):
     db_proxy.create_tables([Metadata, Actresses, Backdrops])
 
 
-class ArrayField(Field):
+class LongBlobField(BlobField):
+    field_type = 'LONGBLOB'
+
+
+class ArrayField(TextField):
     field_type = 'ARRAY'
 
     def db_value(self, value: list[str]) -> str:
@@ -78,8 +82,8 @@ class Backdrops(BasicModel):
     fmt = CharField()
     width = IntegerField()
     height = IntegerField()
-    pos = DoubleField(default=-1)
-    data = BlobField()
+    pos = DoubleField(default=-1.0)
+    data = LongBlobField()
 
 
 if __name__ == '__main__':
