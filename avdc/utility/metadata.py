@@ -92,8 +92,8 @@ class Metadata:
         self.images: list[str] = self._get('images', [])
 
         # source fields
-        self.source: list[str] = self._to_list(self._get('source'))
-        self.website: list[str] = self._to_list(self._get('website'))
+        self.sources: list[str] = self._to_list(self._get('source'))
+        self.providers: list[str] = self._to_list(self._get('provider'))
 
         if not self.vid:
             raise ValueError('metadata missing vid')
@@ -119,7 +119,7 @@ class Metadata:
 
         m = {}
         for k, v in other.toDict().items():
-            if k in ('source', 'website'):
+            if k in ('sources', 'providers'):
                 m[k] = self.get(k) + v
             else:
                 m[k] = self.get(k) or v

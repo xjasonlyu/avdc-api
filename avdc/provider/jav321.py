@@ -164,8 +164,8 @@ def main(keyword: str) -> Metadata:
             'cover': getCover(lx),
             'images': getImages(r.text),
             # 'star_photos': '',
-            'website': r.url,
-            'source': 'jav321',
+            'source': r.url,
+            'provider': 'jav321',
             **data,
         }
     return Metadata(metadata)

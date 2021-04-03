@@ -170,8 +170,8 @@ def main(keyword: str) -> Metadata:
         'genres': getGenres(detail_page),
         'label': getLabel(detail_page),
         # 'star_photos': '',
-        'website': 'https://xcity.jp' + urls,
-        'source': 'xcity',
+        'source': 'https://xcity.jp' + urls,
+        'provider': 'xcity',
         'series': getSeries(detail_page),
     })
 

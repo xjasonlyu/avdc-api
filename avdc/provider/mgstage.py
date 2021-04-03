@@ -130,8 +130,8 @@ def main(keyword: str) -> Metadata:
         'label': getLabel(a),
         'images': getImages(text),
         # 'star_photos': '',
-        'website': url,
-        'source': 'mgstage',
+        'source': url,
+        'provider': 'mgstage',
         'series': getSeries(a),
     })
 

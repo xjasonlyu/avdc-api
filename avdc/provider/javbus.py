@@ -131,8 +131,8 @@ def main(keyword: str) -> Metadata:
         'genres': getGenres(text),
         'images': getImages(text),
         'label': getSeries(text),
-        'website': url,
-        'source': 'javbus',
+        'source': url,
+        'provider': 'javbus',
         'series': getSeries(text),
     })
 

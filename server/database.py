@@ -50,8 +50,8 @@ class Metadata(BasicModel):
     images = ArrayField()
 
     # source fields
-    source = ArrayField()
-    website = ArrayField()
+    sources = ArrayField()
+    providers = ArrayField()
 
     # date fields
     release = DateField()

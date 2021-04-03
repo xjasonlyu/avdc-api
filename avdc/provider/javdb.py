@@ -217,8 +217,8 @@ def main(keyword: str) -> Metadata:
         'genres': getGenres(detail_page),
         'label': getLabel(detail_page),
         # 'star_photos': getActressPhoto(detail_page),
-        'website': 'https://javdb.com' + correct_url,
-        'source': 'javdb',
+        'source': 'https://javdb.com' + correct_url,
+        'provider': 'javdb',
         'series': getSeries(detail_page),
     })
 

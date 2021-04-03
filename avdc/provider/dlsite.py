@@ -146,8 +146,8 @@ def main(keyword: str) -> Metadata:
         'genres': getGenres(text),
         'label': getLabel(text),
         # 'star_photos': '',
-        'website': url,
-        'source': 'dlsite',
+        'source': url,
+        'provider': 'dlsite',
         'series': getSeries(text),
     })
 

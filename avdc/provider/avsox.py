@@ -118,8 +118,8 @@ def main(keyword: str) -> Metadata:
         # 'small_cover': getSmallCover(search_page),
         'genres': getGenres(text),
         'label': getLabel(info),
-        'website': url,
-        'source': 'avsox',
+        'source': url,
+        'provider': 'avsox',
         'series': getSeries(info),
     })
 

@@ -82,8 +82,8 @@ def main(keyword: str) -> Metadata:
         'cover': getCover(text),
         'images': getImages(text),
         'genres': getGenres(keyword),
-        'website': url,
-        'source': 'fc2',
+        'source': url,
+        'provider': 'fc2',
         'series': '',
     })
 

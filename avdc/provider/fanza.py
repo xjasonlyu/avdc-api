@@ -248,8 +248,8 @@ def main(keyword: str) -> Metadata:
         'genres': getGenres(text),
         'images': getImages(text),
         'label': getLabel(text),
-        'website': chosen_url,
-        'source': 'fanza',
+        'source': chosen_url,
+        'provider': 'fanza',
         'series': getSeries(text),
     })
 
