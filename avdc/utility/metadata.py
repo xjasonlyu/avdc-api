@@ -9,8 +9,8 @@ class BaseMetadata:
                  source: Optional[str] = None,
                  provider: Optional[str] = None,
                  **kwargs):
-        self.sources: list[str] = kwargs.get('sources', [])
-        self.providers: list[str] = kwargs.get('providers', [])
+        self.sources: list[str] = kwargs.pop('sources', [])
+        self.providers: list[str] = kwargs.pop('providers', [])
 
         if source:
             assert isinstance(source, str)
