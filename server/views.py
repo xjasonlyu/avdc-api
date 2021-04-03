@@ -8,12 +8,12 @@ from werkzeug.exceptions import HTTPException
 from avdc.utility import image
 from server import api
 from server import app
-from server.database import sqlite_db_init
+from server.database import database_init
 
 
 @app.before_first_request
 def _init_database():
-    sqlite_db_init(app.config.get('DATABASE'))
+    database_init(app.config.get('DBURL'))
 
 
 @app.before_request

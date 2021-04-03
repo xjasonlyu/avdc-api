@@ -8,6 +8,7 @@ services:
       - HTTP_PROXY=http://192.168.1.1:1080
       - HTTPS_PROXY=http://192.168.1.1:1080
       - AVDC_TOKEN=token
+      - AVDC_DBURL=sqlite:///avdc.db
     ports:
       - 5000:5000
     volumes:
