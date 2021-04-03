@@ -212,7 +212,7 @@ def GetBackdropImageByVID(vid: str, update: bool = False) -> Optional[Cover]:
 
 
 def GetPrimaryImageByVID(vid: str, *args, **kwargs) -> Optional[bytes]:
-    cover = db_api.GetCoverByVID(vid+'@primary')  # try primary
+    cover = db_api.GetCoverByVID(vid + '@primary')  # try primary
     if not cover:
         cover = GetBackdropImageByVID(vid, *args, **kwargs)
 

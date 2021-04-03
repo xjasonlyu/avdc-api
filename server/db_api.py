@@ -6,7 +6,7 @@ from avdc.utility.image import getRawImageFormat, getRawImageSize
 from avdc.utility.metadata import Actress as _A
 from avdc.utility.metadata import Metadata as _M
 from server.cover import Cover
-from server.database import Metadata, Actresses, Backdrops
+from server.database import Metadata, Actresses, Covers
 
 
 def GetMetadataByVID(vid: str) -> Optional[_M]:
@@ -45,9 +45,9 @@ def StoreActress(actress: _A, update: bool = False):
 def GetCoverByVID(vid: str) -> Optional[Cover]:
     vid = vid.upper()
     try:
-        result: Backdrops = Backdrops.get((Backdrops.vid == vid) |
-                                          (Backdrops.vid == vid.replace('-', '_')) |
-                                          (Backdrops.vid == vid.replace('_', '-')))
+        result: Covers = Covers.get((Covers.vid == vid) |
+                                    (Covers.vid == vid.replace('-', '_')) |
+                                    (Covers.vid == vid.replace('_', '-')))
     except DoesNotExist:
         return
 
@@ -64,7 +64,7 @@ def StoreCover(vid: str,
     if not width or not height:
         height, width = getRawImageSize(data)
 
-    (Backdrops
+    (Covers
      .insert(vid=vid,
              pos=pos,
              data=data,
