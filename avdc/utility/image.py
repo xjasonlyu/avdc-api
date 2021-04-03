@@ -38,6 +38,10 @@ def getRawImageFormat(data: bytes) -> Optional[str]:
     return fmt.lower() if isinstance(fmt, str) else None
 
 
+def getRawImageSize(data: bytes) -> tuple[int, int]:
+    return getImageSize(bytesToImage(data))  # height, width
+
+
 def getImageSize(img: np.ndarray) -> tuple[int, int]:
     s = img.shape
     return s[0], s[1]  # height, width

@@ -12,3 +12,4 @@ face_recognition
 flask
 Werkzeug
 pymysql
+dotmap

@@ -1,11 +1,12 @@
 from typing import Optional
 
+from dotmap import DotMap
 from peewee import DoesNotExist
 
-from avdc.utility.image import getRawImageFormat
+from avdc.utility.image import getRawImageFormat, getRawImageSize
 from avdc.utility.metadata import Actress as _A
 from avdc.utility.metadata import Metadata as _M
-from server.database import Metadata, Actresses, Covers
+from server.database import Metadata, Actresses, Backdrops
 
 
 def GetMetadataByVID(vid: str) -> Optional[_M]:
@@ -41,22 +42,34 @@ def StoreActress(actress: _A, update: bool = False):
      .execute())
 
 
-def GetCoverByVID(vid: str) -> Optional[tuple[str, bytes, float]]:
+def GetCoverByVID(vid: str) -> Optional[DotMap]:
     vid = vid.upper()
     try:
-        result: Covers = Covers.get((Covers.vid == vid) |
-                                    (Covers.vid == vid.replace('-', '_')) |
-                                    (Covers.vid == vid.replace('_', '-')))
+        result: Backdrops = Backdrops.get((Backdrops.vid == vid) |
+                                          (Backdrops.vid == vid.replace('-', '_')) |
+                                          (Backdrops.vid == vid.replace('_', '-')))
     except DoesNotExist:
         return
-    return result.format, result.data, result.pos
+
+    return DotMap(**result.__data__)
 
 
-def StoreCover(vid: str, data: bytes, fmt: Optional[str] = None, pos: float = -1, update: bool = False):
-    (Covers
+def StoreCover(vid: str,
+               data: bytes,
+               width: Optional[int] = None,
+               height: Optional[int] = None,
+               fmt: Optional[str] = None,
+               pos: float = -1,
+               update: bool = False):
+    if not width or not height:
+        height, width = getRawImageSize(data)
+
+    (Backdrops
      .insert(vid=vid,
+             pos=pos,
              data=data,
-             format=fmt or getRawImageFormat(data),
-             pos=pos)
+             width=width,
+             height=height,
+             fmt=fmt or getRawImageFormat(data), )
      .on_conflict('REPLACE' if update else 'IGNORE')
      .execute())

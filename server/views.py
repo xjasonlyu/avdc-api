@@ -105,12 +105,11 @@ def _metadata(vid: str):
 @app.route('/image/backdrop/<vid>')
 @api.extract_vid
 def _backdrop_image(vid: str):
-    result = api.GetBackdropImageByVID(vid)
-    if not result:
+    cover = api.GetBackdropImageByVID(vid)
+    if not cover:
         return jsonify(status=False,
                        message=f'backdrop image not found: {vid}'), HTTPStatus.NOT_FOUND
-    fmt, data, _ = result
-    return Response(data, mimetype=f'image/{fmt}')
+    return Response(cover.data, mimetype=f'image/{cover.fmt}')
 
 
 @app.route('/image/primary/<vid>')
@@ -138,11 +137,11 @@ def _thumb_image(vid: str):
 @app.route('/imageinfo/backdrop/<vid>')
 @api.extract_vid
 def _backdrop_image_info(vid: str):
-    data = api.GetBackdropImageSizeByVID(vid)
-    if not data:
+    size = api.GetBackdropImageSizeByVID(vid)
+    if not size:
         return jsonify(status=False,
                        message=f'backdrop image not found: {vid}'), HTTPStatus.NOT_FOUND
-    height, width = data
+    height, width = size
     return jsonify(height=height, width=width)  # only size info for now
 
 

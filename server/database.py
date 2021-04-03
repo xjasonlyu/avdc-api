@@ -9,7 +9,7 @@ def database_init(url: str):
                  field_types={'ARRAY': 'TEXT'})
     db_proxy.initialize(db)
     # create table if not exist
-    db_proxy.create_tables([Metadata, Actresses, Covers])
+    db_proxy.create_tables([Metadata, Actresses, Backdrops])
 
 
 class ArrayField(Field):
@@ -73,11 +73,11 @@ class Actresses(BasicModel):
     sources = ArrayField(null=True)
 
 
-class Covers(BasicModel):
+class Backdrops(BasicModel):
     vid = CharField(primary_key=True, unique=True)
+    fmt = CharField()
     width = IntegerField()
-    height = IntegerField
-    format = CharField()
+    height = IntegerField()
     pos = DoubleField(default=-1)
     data = BlobField()
 

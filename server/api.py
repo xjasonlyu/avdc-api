@@ -3,6 +3,8 @@ import re
 from functools import wraps
 from typing import Any, Callable, Optional
 
+from dotmap import DotMap
+
 from avdc.actress import gfriends
 from avdc.actress import xslist
 from avdc.provider import avsox
@@ -17,7 +19,7 @@ from avdc.provider import mgstage
 from avdc.provider import xcity
 from avdc.utility.image import (cropImage,
                                 autoCropImage,
-                                getImageSize,
+                                getRawImageSize,
                                 getRawImageByURL,
                                 getRawImageFormat,
                                 imageToBytes,
@@ -172,23 +174,26 @@ def GetActressByName(name: str, update: bool = False) -> Optional[Actress]:
 def UpdateCoverPositionByVID(m: Metadata, pos: float):
     pos = pos if 0 <= pos <= 1 else -1
 
-    result = db_api.GetCoverByVID(m.vid)
-    if not result:
+    cover = db_api.GetCoverByVID(m.vid)
+    if not cover:
         data = getRawImageByURL(m.cover)
         fmt = getRawImageFormat(data)
+        height, width = getRawImageSize(data)
     else:
-        if abs(result[2] - pos) < 0.01:  # almost equal
+        if abs(cover.pos - pos) < 0.01:  # almost equal
             return
-        fmt, data = result[:2]
+        fmt, data, height, width = (cover.fmt, cover.data,
+                                    cover.height, cover.width)
 
-    db_api.StoreCover(m.vid, data, fmt, pos=pos, update=True)
+    db_api.StoreCover(m.vid, data, fmt=fmt, pos=pos,
+                      width=width, height=height, update=True)
 
 
-def _getCoverImageByVID(vid: str, update: bool = False) -> Optional[tuple[str, bytes, float]]:
+def GetBackdropImageByVID(vid: str, update: bool = False) -> Optional[DotMap]:
     if not update:
-        result = db_api.GetCoverByVID(vid)
-        if result:
-            return result  # format, data, pos
+        cover = db_api.GetCoverByVID(vid)
+        if cover:
+            return cover
 
     m = GetMetadataByVID(vid)
     if not is_valid_metadata(m) or not m.cover:
@@ -196,21 +201,20 @@ def _getCoverImageByVID(vid: str, update: bool = False) -> Optional[tuple[str, b
 
     data = getRawImageByURL(m.cover)
     fmt = getRawImageFormat(data)
+    height, width = getRawImageSize(data)
 
     if fmt is None:
         raise Exception(f'{m.vid}: cover image format detection failed')
 
-    db_api.StoreCover(m.vid, data, fmt, update=update)
-    return fmt, data, -1
-
-
-def GetBackdropImageByVID(vid: str, *args, **kwargs) -> Optional[tuple[str, bytes, float]]:
-    return _getCoverImageByVID(vid, *args, **kwargs)
+    cover = DotMap(vid=m.vid, data=data, fmt=fmt, pos=-1,
+                   width=width, height=height)
+    db_api.StoreCover(**cover.toDict(), update=update)
+    return cover
 
 
 def GetPrimaryImageByVID(vid: str, *args, **kwargs) -> Optional[bytes]:
-    result = _getCoverImageByVID(vid, *args, **kwargs)
-    if not result:
+    cover = GetBackdropImageByVID(vid, *args, **kwargs)
+    if not cover:
         return
 
     face_detection = False  # disabled by default
@@ -221,26 +225,23 @@ def GetPrimaryImageByVID(vid: str, *args, **kwargs) -> Optional[bytes]:
             or _is_in_s_list(vid):
         face_detection = True
 
-    _, data, pos = result
-    return imageToBytes(autoCropImage(bytesToImage(data), pos=pos, face_detection=face_detection))
+    return imageToBytes(autoCropImage(bytesToImage(cover.data), pos=cover.pos, face_detection=face_detection))
 
 
 def GetThumbImageByVID(vid: str, *args, **kwargs) -> Optional[bytes]:
-    result = _getCoverImageByVID(vid, *args, **kwargs)
-    if not result:
+    cover = GetBackdropImageByVID(vid, *args, **kwargs)
+    if not cover:
         return
 
-    _, data, _ = result
-    return imageToBytes(cropImage(bytesToImage(data), scale=16 / 9, default_to_top=False))
+    return imageToBytes(cropImage(bytesToImage(cover.data), scale=16 / 9, default_to_top=False))
 
 
 def GetBackdropImageSizeByVID(vid: str, *args, **kwargs) -> Optional[tuple[int, int]]:
-    result = _getCoverImageByVID(vid, *args, **kwargs)
-    if not result:
+    cover = GetBackdropImageByVID(vid, *args, **kwargs)
+    if not cover:
         return
 
-    _, data, _ = result
-    return getImageSize(bytesToImage(data))  # height, width
+    return cover.height, cover.width  # height, width
 
 
 if __name__ == '__main__':
