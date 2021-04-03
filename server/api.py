@@ -3,8 +3,6 @@ import re
 from functools import wraps
 from typing import Any, Callable, Optional
 
-from dotmap import DotMap
-
 from avdc.actress import gfriends
 from avdc.actress import xslist
 from avdc.provider import avsox
@@ -29,6 +27,7 @@ from avdc.utility.metadata import Metadata
 from avdc.utility.misc import parseVID, concurrentMap
 from server import app
 from server import db_api
+from server.cover import Cover
 
 
 def extract_vid(fn: Callable[[str], Any]):
@@ -189,7 +188,7 @@ def UpdateCoverPositionByVID(m: Metadata, pos: float):
                       width=width, height=height, update=True)
 
 
-def GetBackdropImageByVID(vid: str, update: bool = False) -> Optional[DotMap]:
+def GetBackdropImageByVID(vid: str, update: bool = False) -> Optional[Cover]:
     if not update:
         cover = db_api.GetCoverByVID(vid)
         if cover:
@@ -206,8 +205,8 @@ def GetBackdropImageByVID(vid: str, update: bool = False) -> Optional[DotMap]:
     if fmt is None:
         raise Exception(f'{m.vid}: cover image format detection failed')
 
-    cover = DotMap(vid=m.vid, data=data, fmt=fmt, pos=-1,
-                   width=width, height=height)
+    cover = Cover(vid=m.vid, data=data, fmt=fmt, pos=-1,
+                  width=width, height=height)
     db_api.StoreCover(**cover.toDict(), update=update)
     return cover
 

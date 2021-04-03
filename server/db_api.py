@@ -1,11 +1,11 @@
 from typing import Optional
 
-from dotmap import DotMap
 from peewee import DoesNotExist
 
 from avdc.utility.image import getRawImageFormat, getRawImageSize
 from avdc.utility.metadata import Actress as _A
 from avdc.utility.metadata import Metadata as _M
+from server.cover import Cover
 from server.database import Metadata, Actresses, Backdrops
 
 
@@ -42,7 +42,7 @@ def StoreActress(actress: _A, update: bool = False):
      .execute())
 
 
-def GetCoverByVID(vid: str) -> Optional[DotMap]:
+def GetCoverByVID(vid: str) -> Optional[Cover]:
     vid = vid.upper()
     try:
         result: Backdrops = Backdrops.get((Backdrops.vid == vid) |
@@ -51,7 +51,7 @@ def GetCoverByVID(vid: str) -> Optional[DotMap]:
     except DoesNotExist:
         return
 
-    return DotMap(**result.__data__)
+    return Cover(**result.__data__)
 
 
 def StoreCover(vid: str,
