@@ -244,10 +244,6 @@ def GetBackdropImageSizeByVID(vid: str, *args, **kwargs) -> Optional[tuple[int, 
 
 
 if __name__ == '__main__':
-    # from server.database import sqlite_db_init, Metadata
-    #
-    # sqlite_db_init('../avdc.db')
-    #
     # print(GetMetadataByVID('abp-233', update=True))
     # print(GetActressByName('通野未帆'))
     print(_getRemoteMetadata('100518-766'))
