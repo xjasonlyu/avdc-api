@@ -1,4 +1,5 @@
 import argparse
+import logging
 import os
 
 from werkzeug.serving import run_simple
@@ -24,6 +25,10 @@ def parse_arguments():
 
 def main():
     args = parse_arguments()
+
+    if args.debug:
+        app.debug = True
+        logging.basicConfig(level=logging.DEBUG)
 
     app.config.update(DATABASE=os.environ.get('AVDC_DATABASE') or args.database)
     app.config.update(TOKEN=os.environ.get('AVDC_TOKEN') or args.token)
