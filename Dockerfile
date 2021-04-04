@@ -11,7 +11,7 @@ RUN pip install --no-cache-dir -U pip \
 ENV HTTP_PROXY=""
 ENV HTTPS_PROXY=""
 
-ENV AVDC_DBURL=""
+ENV AVDC_DATABASE=""
 ENV AVDC_TOKEN=""
 
 ENV PORT=5000

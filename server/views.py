@@ -13,7 +13,7 @@ from server.database import database_init
 
 @app.before_first_request
 def _init_database():
-    database_init(app.config.get('DBURL'))
+    database_init(app.config.get('DATABASE'))
 
 
 @app.before_request

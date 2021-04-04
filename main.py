@@ -13,7 +13,7 @@ def parse_arguments():
                         help='host to serve [Default=0.0.0.0]')
     parser.add_argument('-p', '--port', type=int, default=5000,
                         help='port to serve [Default=5000]')
-    parser.add_argument('-d', '--db-url', type=str, default='sqlite:///:memory:',
+    parser.add_argument('-d', '--database', type=str, default='sqlite:///:memory:',
                         help='database url to load [Default=sqlite:///:memory:]')
     parser.add_argument('-t', '--token', type=str, help='token for avdc api')
     parser.add_argument('--debug', action='store_true',
@@ -25,8 +25,8 @@ def parse_arguments():
 def main():
     args = parse_arguments()
 
+    app.config.update(DATABASE=os.environ.get('AVDC_DATABASE') or args.database)
     app.config.update(TOKEN=os.environ.get('AVDC_TOKEN') or args.token)
-    app.config.update(DBURL=os.environ.get('AVDC_DBURL') or args.db_url)
 
     run_simple(hostname=args.bind,
                port=args.port,
