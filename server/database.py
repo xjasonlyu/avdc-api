@@ -90,4 +90,4 @@ class Covers(BasicModel):
 
 
 if __name__ == '__main__':
-    database_init('sqlite:///:memory:')
+    database_init('sqlite:///avdc.db')
