@@ -8,7 +8,7 @@ from werkzeug.exceptions import HTTPException
 from avdc.utility import image
 from server import api
 from server import app
-from server.database import database_init
+from server.database import db, database_init
 
 
 @app.before_first_request
@@ -30,6 +30,16 @@ def _check_token():
             or authorization[1] != token:
         return jsonify(status=False,
                        message='unauthorized'), HTTPStatus.UNAUTHORIZED
+
+
+@app.before_request
+def _connect_db():
+    db.connect()
+
+
+@app.teardown_request
+def _close_db(_):
+    db.close()
 
 
 @app.errorhandler(Exception)

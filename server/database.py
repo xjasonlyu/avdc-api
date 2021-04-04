@@ -8,8 +8,11 @@ def database_init(url: str):
     _db = connect(url,
                   field_types={'ARRAY': 'TEXT'})
     db.initialize(_db)
+
+    db.connect()
     # create table if not exist
     db.create_tables([Metadata, Actresses, Covers])
+    db.close()
 
 
 class LongBlobField(BlobField):
