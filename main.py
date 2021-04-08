@@ -14,8 +14,8 @@ def parse_arguments():
                         help='host to serve [Default=0.0.0.0]')
     parser.add_argument('-p', '--port', type=int, default=5000,
                         help='port to serve [Default=5000]')
-    parser.add_argument('-d', '--database', type=str, default='sqlite+pool:///avdc.db',
-                        help='database url to load [Default=sqlite+pool:///avdc.db]')
+    parser.add_argument('-d', '--database', type=str, default='sqlite+pool:///avdc.db?check_same_thread=false',
+                        help='database url to load [Default=sqlite+pool:///avdc.db?check_same_thread=false]')
     parser.add_argument('-t', '--token', type=str, help='token for avdc api')
     parser.add_argument('--debug', action='store_true',
                         help='enable debug mode')
