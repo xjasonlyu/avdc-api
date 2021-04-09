@@ -19,8 +19,8 @@ def getRemoteImageSizeByURL(url: str) -> tuple[int, int]:
         return getSize(stream)[::-1]  # height, width
 
 
-def getRawImageByURL(url: str) -> bytes:
-    return get_blob(url, raise_for_status=True)
+def getRawImageByURL(url: str, **kwargs) -> bytes:
+    return get_blob(url, raise_for_status=True, **kwargs)
 
 
 def getRawImageFormat(data: bytes) -> Optional[str]:

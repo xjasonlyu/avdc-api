@@ -8,6 +8,7 @@ from avdc.actress import xslist
 from avdc.model.actress import Actress
 from avdc.model.cover import Cover
 from avdc.model.metadata import Metadata
+from avdc.provider import arzon
 from avdc.provider import avsox
 from avdc.provider import dlsite
 from avdc.provider import fanza
@@ -62,6 +63,7 @@ _s_list = ('ara', 'bnjc', 'dcv', 'endx', 'eva', 'ezd', 'gana',
            'siro', 'srcn', 'sqb', 'sweet', 'svmm', 'urf', 'fcp')
 
 _functions = {
+    'arzon': arzon.main,
     'avsox': avsox.main,
     'fanza': fanza.main,
     'fc2': fc2.main,
@@ -74,7 +76,7 @@ _functions = {
     'dlsite': dlsite.main,
 }
 
-_priority = 'javbus+jav321,mgstage,avsox,javdb,fanza,xcity,dlsite,fc2'
+_priority = 'javbus+jav321,mgstage,avsox,javdb,arzon,fanza,xcity,dlsite,fc2'
 
 
 def _is_in_s_list(keyword: str) -> bool:
@@ -198,7 +200,11 @@ def GetBackdropImageByVID(vid: str, update: bool = False) -> Optional[Cover]:
     if not is_valid_metadata(m) or not m.cover:
         return
 
-    data = getRawImageByURL(m.cover)
+    headers = {}
+    if 'arzon' in m.cover:
+        headers.update(referer='https://www.arzon.jp/')
+
+    data = getRawImageByURL(m.cover, headers=headers)
     fmt = getRawImageFormat(data)
     height, width = getRawImageSize(data)
 
