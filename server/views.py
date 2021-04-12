@@ -22,6 +22,9 @@ def _check_token():
     if not token:
         return  # no authorization required
 
+    if request.args.get('token') == token:
+        return  # pass
+
     header = request.headers.get('Authorization', default='', type=str)
     authorization = header.split(' ', maxsplit=1)
 
