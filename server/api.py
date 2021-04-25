@@ -103,7 +103,7 @@ def _getSources(keyword: str) -> list[str]:
     return sources
 
 
-def _getRemoteMetadata(vid: str) -> Optional[Metadata]:
+def _getRemoteMetadata(vid: str, providers: Optional[str] = None) -> Optional[Metadata]:
     def no_exception_call(source: str) -> Optional[Metadata]:
         try:
             return _providers[source](vid)
@@ -111,7 +111,7 @@ def _getRemoteMetadata(vid: str) -> Optional[Metadata]:
             app.logger.warning(f'match metadata from {source}: {vid}: {e}')
             return
 
-    for m in _getSources(vid):
+    for m in (providers.split(',') if providers is not None else _getSources(vid)):
         if not m.strip():
             continue
 
@@ -133,13 +133,13 @@ def _getLocalMetadata(vid: str) -> Optional[Metadata]:
     return db_api.GetMetadataByVID(vid)
 
 
-def GetMetadataByVID(vid: str, update: bool = False) -> Optional[Metadata]:
+def GetMetadataByVID(vid: str, update: bool = False, *args, **kwargs) -> Optional[Metadata]:
     if not update:  # try from database
         m = _getLocalMetadata(vid)
         if is_valid_metadata(m):
             return m
 
-    m = _getRemoteMetadata(vid)
+    m = _getRemoteMetadata(vid, *args, **kwargs)
     if not is_valid_metadata(m):
         return
 

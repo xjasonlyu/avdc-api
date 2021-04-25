@@ -103,8 +103,9 @@ def _metadata(vid: str):
     update = api.str_to_bool(
         request.args.get('update'))
     pos = request.args.get('pos', type=float)
+    providers = request.args.get('providers')
 
-    m = api.GetMetadataByVID(vid, update=update)
+    m = api.GetMetadataByVID(vid, update=update, providers=providers)
     if not m:
         return jsonify(status=False,
                        message=f'metadata not found: {vid}'), HTTPStatus.NOT_FOUND
