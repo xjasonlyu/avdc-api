@@ -8,6 +8,8 @@ from avdc.model.metadata import Metadata
 from avdc.utility.httpclient import get_html
 from avdc.utility.misc import concurrentMap, extractTitle
 
+BASE_URL = 'https://www.javbus.com/ja'
+
 
 def getCover(text: str) -> str:  # 获取封面链接
     doc = pq(text)
@@ -31,31 +33,38 @@ def _getAttribute(text: str, attr: str, sub_expr: str) -> str:
 
 
 def getVID(text: str) -> str:  # 获取番号
-    return _getAttribute(text, '識別碼', './span[2]/text()').upper()
+    return _getAttribute(text, '識別碼', './span[2]/text()') or \
+           _getAttribute(text, '品番', './span[2]/text()')
 
 
 def getStudio(text: str) -> str:  # 获取厂商
-    return _getAttribute(text, '製作商', './a/text()')
+    return _getAttribute(text, '製作商', './a/text()') or \
+           _getAttribute(text, 'メーカー', './a/text()')
 
 
 def getPublisher(text: str) -> str:  # 获取發行商
-    return _getAttribute(text, '發行商', './a/text()')
+    return _getAttribute(text, '發行商', './a/text()') or \
+           _getAttribute(text, 'レーベル', './a/text()')
 
 
 def getRelease(text: str) -> str:  # 获取出版日期
-    return _getAttribute(text, '發行日期', './text()')
+    return _getAttribute(text, '發行日期', './text()') or \
+           _getAttribute(text, '発売日', './text()')
 
 
 def getRuntime(text: str) -> str:  # 获取分钟
-    return _getAttribute(text, '長度', './text()').removesuffix('分鐘')
+    return _getAttribute(text, '長度', './text()').removesuffix('分鐘') or \
+           _getAttribute(text, '収録時間', './text()').removesuffix('分')
 
 
 def getDirector(text: str) -> str:  # 获取导演 已修改
-    return _getAttribute(text, '導演', './a/text()')
+    return _getAttribute(text, '導演', './a/text()') or \
+           _getAttribute(text, '監督', './a/text()')
 
 
 def getSeries(text: str) -> str:  # 获取系列
-    return _getAttribute(text, '系列', './a/text()')
+    return _getAttribute(text, '系列', './a/text()') or \
+           _getAttribute(text, 'シリーズ', './a/text()')
 
 
 def getOverview(_: str) -> str:
@@ -94,7 +103,7 @@ def searchVID(keyword: str):
             return
 
         for result in results:
-            r = re.compile(r'href="https://www.javbus.com/(.*?)"')
+            r = re.compile(rf'href="{BASE_URL}/(.*?)"')
             items = re.findall(r, str(result))
             for vid in items:
                 vid = vid.strip().upper()
@@ -103,8 +112,8 @@ def searchVID(keyword: str):
 
     search_page, search_page_uncensored = concurrentMap(
         lambda url: get_html(url, raise_for_status=lambda r: r.status_code != 404), [
-            f'https://www.javbus.com/search/{keyword}',
-            f'https://www.javbus.com/uncensored/search/{keyword}',
+            f'{BASE_URL}/search/{keyword}',
+            f'{BASE_URL}/uncensored/search/{keyword}',
         ], max_workers=2)
 
     return _searchVID(search_page) or _searchVID(search_page_uncensored)
@@ -115,7 +124,7 @@ def main(keyword: str) -> Metadata:
     if not vid:
         vid = keyword
 
-    url = f'https://www.javbus.com/{vid}'
+    url = f'{BASE_URL}/{vid}'
     text = get_html(url, raise_for_status=True)
 
     return Metadata(**{
@@ -140,4 +149,4 @@ def main(keyword: str) -> Metadata:
 if __name__ == "__main__":
     # print(main('ipx-292'))
     # print(main('111820-001'))
-    print(main('ABP-041'))
+    print(main('IESM-058'))
