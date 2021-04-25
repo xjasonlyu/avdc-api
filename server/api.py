@@ -54,7 +54,7 @@ def str_to_bool(s: str) -> bool:
         return False
 
 
-_s_list = ('ara', 'bnjc', 'dcv', 'endx', 'eva', 'ezd', 'gana',
+_s_list = ('ara', 'bnjc', 'dcv', 'endx', 'endw', 'eva', 'ezd', 'gana',
            'HAMENETS', 'hmdn', 'hoi', 'imdk', 'ion', 'jac',
            'jkz', 'jotk', 'ksko', 'lafbd', 'luxu', 'maan',
            'mium', 'mntj', 'nama', 'ntk', 'nttr', 'obut',
