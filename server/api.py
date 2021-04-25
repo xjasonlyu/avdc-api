@@ -62,7 +62,7 @@ _s_list = ('ara', 'bnjc', 'dcv', 'endx', 'endw', 'eva', 'ezd', 'gana',
            'per', 'pkjd', 'scp', 'scute', 'cute', 'shyn', 'simm',
            'siro', 'srcn', 'sqb', 'sweet', 'svmm', 'urf', 'fcp')
 
-_functions = {
+_providers = {
     'arzon': arzon.main,
     'avsox': avsox.main,
     'fanza': fanza.main,
@@ -106,7 +106,7 @@ def _getSources(keyword: str) -> list[str]:
 def _getRemoteMetadata(vid: str) -> Optional[Metadata]:
     def no_exception_call(source: str) -> Optional[Metadata]:
         try:
-            return _functions[source](vid)
+            return _providers[source](vid)
         except Exception as e:
             app.logger.warning(f'match metadata from {source}: {vid}: {e}')
             return
