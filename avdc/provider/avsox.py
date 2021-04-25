@@ -10,7 +10,7 @@ from avdc.utility.misc import extractTitle
 
 def getTitle(content: str) -> str:
     tree = etree.fromstring(content, etree.HTMLParser())
-    title = str(tree.xpath('/html/body/div[2]/h3/text()')).strip(" ['']")  # [0]
+    title = tree.xpath('/html/body/div[2]/h3/text()')[0]
     return extractTitle(title)
 
 
@@ -25,45 +25,42 @@ def getActresses(content: str) -> list[str]:  # //*[@id="center_column"]/div[2]/
 
 def getStudio(content: str) -> str:
     tree = etree.fromstring(content, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-    result = str(tree.xpath('//p[contains(text(),"制作商: ")]/following-sibling::p[1]/a/text()')) \
-        .strip(" ['']").replace("', '", ' ')
-    return result
+    result = tree.xpath('//p[contains(text(),"メーカー:")]/following-sibling::p[1]/a/text()')
+    return result[0] if result else ''
 
 
 def getRuntime(content: str) -> str:
     tree = etree.fromstring(content, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-    result = str(tree.xpath('//span[contains(text(),"长度:")]/../text()')).strip(" ['分钟']")
-    return result
+    result = tree.xpath('//span[contains(text(),"収録時間:")]/../text()')
+    return result[0].removesuffix('分') if result else ''
 
 
 def getLabel(content: str) -> str:
     tree = etree.fromstring(content, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-    result = str(tree.xpath('//p[contains(text(),"系列:")]/following-sibling::p[1]/a/text()')).strip(" ['']")
-    return result
+    result = tree.xpath('//p[contains(text(),"メーカー:")]/following-sibling::p[1]/a/text()')
+    return result[0] if result else ''
 
 
 def getVID(content: str) -> str:
     tree = etree.fromstring(content, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-    result = str(tree.xpath('//span[contains(text(),"识别码:")]/../span[2]/text()')).strip(" ['']")
-    return result
+    return tree.xpath('//span[contains(text(),"品番:")]/../span[2]/text()')[0]
 
 
 def getRelease(content: str) -> str:
     tree = etree.fromstring(content, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-    result = str(tree.xpath('//span[contains(text(),"发行时间:")]/../text()')).strip(" ['']")
-    return result
+    result = tree.xpath('//span[contains(text(),"発売日:")]/../text()')
+    return result[0] if result else ''
 
 
 def getCover(content: str) -> str:
     tree = etree.fromstring(content, etree.HTMLParser())
-    result = str(tree.xpath('/html/body/div[2]/div[1]/div[1]/a/img/@src')).strip(" ['']")
-    return result
+    return tree.xpath('/html/body/div[2]/div[1]/div[1]/a/img/@src')[0]
 
 
-def getSmallCover(content: str) -> str:
-    tree = etree.fromstring(content, etree.HTMLParser())
-    result = str(tree.xpath('//*[@id="waterfall"]/div/a/div[1]/img/@src')).strip(" ['']")
-    return result
+# def getSmallCover(content: str) -> str:
+#     tree = etree.fromstring(content, etree.HTMLParser())
+#     result = str(tree.xpath('//*[@id="waterfall"]/div/a/div[1]/img/@src')).strip(" ['']")
+#     return result
 
 
 def getGenres(content: str) -> list[str]:
@@ -77,7 +74,8 @@ def getGenres(content: str) -> list[str]:
 
 def getSeries(content: str) -> str:
     tree = etree.fromstring(content, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-    return str(tree.xpath('//span[contains(text(),"系列:")]/../span[2]/text()')).strip(" ['']")
+    result = tree.xpath('//span[contains(text(),"シリーズ:")]/../span[2]/text()')
+    return result[0] if result else ''
 
 
 @cached(cache=TTLCache(maxsize=1, ttl=3600))
@@ -90,7 +88,7 @@ def main(keyword: str) -> Metadata:
     avsox_site = _getAvsoxSite()
 
     def search_url(v):
-        x = get_html(avsox_site + '/cn/search/' + v)
+        x = get_html(avsox_site + '/ja/search/' + v)
         tree = etree.fromstring(x, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
         for r in tree.xpath('//*[@id="waterfall"]/div/a/@href'):
             return str(r), x
