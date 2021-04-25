@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from urllib.parse import urlsplit
 
 from flask import Response
 from flask import jsonify
@@ -18,6 +19,9 @@ def _init_database():
 
 @app.before_request
 def _check_token():
+    if urlsplit(request.url).path.startswith('/image/'):
+        return  # bypass image
+
     token = app.config.get('TOKEN')
     if not token:
         return  # no authorization required
