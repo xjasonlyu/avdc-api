@@ -109,6 +109,10 @@ def _metadata(vid: str):
     pos = request.args.get('pos', type=float)
     providers = request.args.get('providers')
 
+    if providers:
+        update = True
+        providers = providers.replace('-', '+')
+
     m = api.GetMetadataByVID(vid, update=update, providers=providers)
     if not m:
         return jsonify(status=False,
