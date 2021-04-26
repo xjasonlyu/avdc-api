@@ -43,6 +43,8 @@ class BaseModel:
         for k, v in dict(other).items():
             if k in ('sources', 'providers'):
                 m[k] = self.get(k) + v
+            elif k in ('release', ):
+                m[k] = self.get(k) if self.get(k) not in ('', '0000-00-00') else v
             else:
                 m[k] = self.get(k) or v
 
