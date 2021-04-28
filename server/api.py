@@ -206,7 +206,15 @@ def GetBackdropImageByVID(vid: str, update: bool = False) -> Optional[Cover]:
         headers.update(referer='https://www.arzon.jp/')
     # ---------------
 
-    data = getRawImageByURL(m.cover, headers=headers or None)
+    cover_url = m.cover
+
+    # -- for fc2 --
+    if 'fc2' in m.providers and m.images:
+        # use first image for backdrop cover
+        cover_url = m.images[0]
+    # -------------
+
+    data = getRawImageByURL(cover_url, headers=headers or None)
     fmt = getRawImageFormat(data)
     height, width = getRawImageSize(data)
 
