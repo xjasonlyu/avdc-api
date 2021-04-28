@@ -200,11 +200,13 @@ def GetBackdropImageByVID(vid: str, update: bool = False) -> Optional[Cover]:
     if not is_valid_metadata(m) or not m.cover:
         return
 
+    # -- for arzon --
     headers = {}
     if 'arzon' in m.cover:
         headers.update(referer='https://www.arzon.jp/')
+    # ---------------
 
-    data = getRawImageByURL(m.cover, headers=headers)
+    data = getRawImageByURL(m.cover, headers=headers or None)
     fmt = getRawImageFormat(data)
     height, width = getRawImageSize(data)
 
@@ -221,8 +223,6 @@ def GetPrimaryImageByVID(vid: str, *args, **kwargs) -> Optional[bytes]:
     cover = db_api.GetCoverByVID(vid + '@primary')  # try primary
     if not cover:
         cover = GetBackdropImageByVID(vid, *args, **kwargs)
-
-        # we gotta go...
         if not cover:
             return
 
@@ -241,8 +241,6 @@ def GetThumbImageByVID(vid: str, *args, **kwargs) -> Optional[bytes]:
     cover = db_api.GetCoverByVID(vid + '@thumb')  # try thumb
     if not cover:
         cover = GetBackdropImageByVID(vid, *args, **kwargs)
-
-        # we gotta go...
         if not cover:
             return
 
