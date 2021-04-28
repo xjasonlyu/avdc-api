@@ -238,9 +238,13 @@ def GetPrimaryImageByVID(vid: str, *args, **kwargs) -> Optional[bytes]:
 
 
 def GetThumbImageByVID(vid: str, *args, **kwargs) -> Optional[bytes]:
-    cover = GetBackdropImageByVID(vid, *args, **kwargs)
+    cover = db_api.GetCoverByVID(vid + '@thumb')  # try thumb
     if not cover:
-        return
+        cover = GetBackdropImageByVID(vid, *args, **kwargs)
+
+        # we gotta go...
+        if not cover:
+            return
 
     return imageToBytes(cropImage(bytesToImage(cover.data), scale=16 / 9, default_to_top=False))
 
