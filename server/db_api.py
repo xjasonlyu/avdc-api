@@ -1,6 +1,6 @@
 from typing import Optional
 
-from peewee import DoesNotExist
+from peewee import DoesNotExist, fn
 
 from avdc.model.actress import Actress as _A
 from avdc.model.cover import Cover
@@ -12,9 +12,9 @@ from server.database import Metadata, Actresses, Covers
 def GetMetadataByVID(vid: str) -> Optional[_M]:
     vid = vid.upper()
     try:
-        result: Metadata = Metadata.get((Metadata.vid == vid) |
-                                        (Metadata.vid == vid.replace('-', '_')) |
-                                        (Metadata.vid == vid.replace('_', '-')))
+        result: Metadata = Metadata.get((fn.Upper(Metadata.vid) == vid) |
+                                        (fn.Upper(Metadata.vid) == vid.replace('-', '_')) |
+                                        (fn.Upper(Metadata.vid) == vid.replace('_', '-')))
     except DoesNotExist:
         return
     return _M(**result.__data__)
@@ -29,7 +29,7 @@ def StoreMetadata(metadata: _M, update: bool = False):
 
 def GetActressByName(name: str) -> Optional[_A]:
     try:
-        result: Actresses = Actresses.get((Actresses.name == name))
+        result: Actresses = Actresses.get((fn.Upper(Actresses.name) == name.upper()))
     except DoesNotExist:
         return
     return _A(**result.__data__)
@@ -45,9 +45,9 @@ def StoreActress(actress: _A, update: bool = False):
 def GetCoverByVID(vid: str) -> Optional[Cover]:
     vid = vid.upper()
     try:
-        result: Covers = Covers.get((Covers.vid == vid) |
-                                    (Covers.vid == vid.replace('-', '_')) |
-                                    (Covers.vid == vid.replace('_', '-')))
+        result: Covers = Covers.get((fn.Upper(Covers.vid) == vid) |
+                                    (fn.Upper(Covers.vid) == vid.replace('-', '_')) |
+                                    (fn.Upper(Covers.vid) == vid.replace('_', '-')))
     except DoesNotExist:
         return
 
