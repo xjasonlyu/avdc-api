@@ -1,11 +1,11 @@
-import re
+import json
 from urllib.parse import urljoin
 
 from lxml import etree
 
 from avdc.model.metadata import Metadata
 from avdc.provider import NotFound
-from avdc.utility.httpclient import get_html
+from avdc.utility.httpclient import get_html, Session
 
 
 def getTitle(text: str) -> str:
@@ -14,21 +14,23 @@ def getTitle(text: str) -> str:
     return result[0] if result else ''
 
 
-def getActresses(text: str) -> list[str]:
-    _ = text
-    return []  # fc2 no actresses
+def getOverview(text: str, session: Session) -> str:
+    html = etree.fromstring(text, etree.HTMLParser())
+    result = html.xpath('//*[@id="top"]/div[1]/section[4]/iframe/@src')
+    if not result:
+        return ''
+
+    url = urljoin('https://adult.contents.fc2.com/', result[0])
+    return '\n'.join(i.strip() for i in
+                     etree.fromstring(session.get(url).text,
+                                      etree.HTMLParser()).xpath('/html/body/div/text()')
+                     if i.strip())
 
 
 def getStudio(text: str) -> str:  # 获取厂商
     html = etree.fromstring(text, etree.HTMLParser())
     result = html.xpath('//*[@id="top"]/div[1]/section[1]/div/section/div[2]/ul/li[3]/a/text()')
     return result[0] if result else ''
-
-
-# def getVID(text: str) -> str:  # 获取番号
-#     html = etree.fromstring(text, etree.HTMLParser())
-#     result = str(html.xpath('/html/body/div[5]/div[1]/div[2]/p[1]/span[2]/text()')).strip(" ['']")
-#     return result
 
 
 def getRelease(text: str) -> str:
@@ -45,20 +47,24 @@ def getCover(text: str) -> str:
 
 
 def getGenres(number: str) -> list[str]:
-    text = str(bytes(get_html(f'https://adult.contents.fc2.com/api/v4/article/{number}/tag?'), 'utf-8').decode(
-        'unicode-escape'))
-    result = re.findall('"tag":"(.*?)"', text)
-    return result
+    url = f'https://adult.contents.fc2.com/api/v4/article/{number}/tag?'
+    data = json.loads(get_html(url))
+    if data['code'] != 200:
+        raise ValueError(f"Bad code: {data['code']}")
+    return [i['tag'] for i in data.get('tags', [])]
 
 
 def getImages(text: str) -> list[str]:  # 获取剧照
-    hr = re.compile(r'<ul class=\"items_article_SampleImagesArea\"[\s\S]*?</ul>')
-    html = hr.search(text)
-    if html:
-        html = html.group()
-        hf = re.compile(r'<a href=\"(.*?)\"')
-        return hf.findall(html)
-    return []
+    html = etree.fromstring(text, etree.HTMLParser())
+    results = html.xpath('//*[@id="top"]/div[1]/section[2]/ul/li')
+    return [result.xpath('.//a/@href')[0] for result in results
+            if result.xpath('.//a/@href')]
+
+
+def checkProduct(text: str) -> bool:
+    html = etree.fromstring(text, etree.HTMLParser())
+    title = html.xpath('/html/head/title/text()')[0]
+    return 'Unable to find Product.' not in title
 
 
 def main(keyword: str) -> Metadata:
@@ -71,20 +77,22 @@ def main(keyword: str) -> Metadata:
     if not keyword.isdecimal():
         raise ValueError(f'invalid product number: {keyword}')
 
-    url = f'https://adult.contents.fc2.com/article/{keyword}/'
-    text = get_html(url)
+    with Session() as session:
+        url = f'https://adult.contents.fc2.com/article/{keyword}/'
+        text = session.get(url).text
+        # overview
+        overview = getOverview(text, session)
 
-    if 'The product you were looking for was not found.' in text \
-            or 'ご指定のファイルが見つかりませんでした' in text:
-        raise NotFound(f'fc2: {keyword} not found')
+    if not checkProduct(text):
+        raise NotFound(f'{keyword} not found')
 
     return Metadata(**{
         'title': getTitle(text),
         'studio': getStudio(text),
-        'overview': '',
+        'overview': overview,
         'runtime': 0,
         'director': getStudio(text),
-        'actresses': getActresses(text),
+        'actresses': [],  # fc2 no actresses
         'release': getRelease(text),
         'vid': f'FC2-{keyword}',
         'label': '',
