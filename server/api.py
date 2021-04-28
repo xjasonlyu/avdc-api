@@ -1,4 +1,5 @@
 import json
+import os
 import re
 from functools import wraps
 from typing import Any, Callable, Optional
@@ -212,6 +213,14 @@ def GetBackdropImageByVID(vid: str, update: bool = False) -> Optional[Cover]:
     if 'fc2' in m.providers and m.images:
         # use first image for backdrop cover
         cover_url = m.images[0]
+        # store primary cover
+        data = getRawImageByURL(m.cover)
+        fmt = getRawImageFormat(data) or os.path.splitext(m.cover)[-1].strip('.')
+        height, width = getRawImageSize(data)
+        cover = Cover(vid=m.vid + '@primary',
+                      data=data, fmt=fmt, pos=0.5,
+                      width=width, height=height)
+        db_api.StoreCover(**cover.toDict(), update=update)
     # -------------
 
     data = getRawImageByURL(cover_url, headers=headers or None)
