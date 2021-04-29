@@ -217,7 +217,7 @@ def GetBackdropImageByVID(vid: str, update: bool = False) -> Optional[Cover]:
         data = getRawImageByURL(m.cover)
         fmt = getRawImageFormat(data) or os.path.splitext(m.cover)[-1].strip('.')
         height, width = getRawImageSize(data)
-        cover = Cover(vid=m.vid + '@primary',
+        cover = Cover(vid=m.vid + '@PRIMARY',
                       data=data, fmt=fmt, pos=0.5,
                       width=width, height=height)
         db_api.StoreCover(**cover.toDict(), update=update)
@@ -237,7 +237,7 @@ def GetBackdropImageByVID(vid: str, update: bool = False) -> Optional[Cover]:
 
 
 def GetPrimaryImageByVID(vid: str, *args, **kwargs) -> Optional[bytes]:
-    cover = db_api.GetCoverByVID(vid + '@primary')  # try primary
+    cover = db_api.GetCoverByVID(vid + '@PRIMARY')  # try primary
     if not cover:
         cover = GetBackdropImageByVID(vid, *args, **kwargs)
         if not cover:
@@ -255,7 +255,7 @@ def GetPrimaryImageByVID(vid: str, *args, **kwargs) -> Optional[bytes]:
 
 
 def GetThumbImageByVID(vid: str, *args, **kwargs) -> Optional[bytes]:
-    cover = db_api.GetCoverByVID(vid + '@thumb')  # try thumb
+    cover = db_api.GetCoverByVID(vid + '@THUMB')  # try thumb
     if not cover:
         cover = GetBackdropImageByVID(vid, *args, **kwargs)
         if not cover:
