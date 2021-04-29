@@ -19,7 +19,9 @@ def _init_database():
 
 @app.before_request
 def _check_token():
-    if urlsplit(request.url).path.startswith('/image/'):
+    p = urlsplit(request.url).path
+    if not (p.startswith('/actress/') or
+            p.startswith('/metadata/')):
         return  # bypass image
 
     token = app.config.get('TOKEN')
