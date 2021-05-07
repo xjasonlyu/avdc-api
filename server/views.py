@@ -158,6 +158,27 @@ def _thumb_image(vid: str):
     return Response(data, mimetype=f'image/jpeg')
 
 
+@app.route('/image/remote')
+def _remote_image():
+    url: str = request.args.get('url')
+    if not url or not url.startswith('http'):
+        return jsonify(status=False,
+                       message=f'invalid url: {url}'), HTTPStatus.BAD_REQUEST
+
+    data = image.getRawImageByURL(url)
+
+    scale: float = request.args.get('scale', type=float)
+    if not scale:
+        fmt = image.getRawImageFormat(data)
+        return Response(data, mimetype=f'image/{fmt}')
+
+    return Response(
+        image.imageToBytes(
+            image.cropImage(
+                image.bytesToImage(data), scale=scale, default_to_right=False, default_to_top=False)),
+        mimetype=f'image/jpeg')
+
+
 @app.route('/imageinfo/remote')
 def _remote_image_info():
     url: str = request.args.get('url')
