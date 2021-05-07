@@ -159,7 +159,10 @@ def _thumb_image(vid: str):
 
 
 @app.route('/image/remote')
-def _remote_image():
+@app.route('/image/remote/<name>')
+def _remote_image(name: str):
+    _ = name
+
     url: str = request.args.get('url')
     if not url or not url.startswith('http'):
         return jsonify(status=False,
@@ -180,7 +183,10 @@ def _remote_image():
 
 
 @app.route('/imageinfo/remote')
-def _remote_image_info():
+@app.route('/imageinfo/remote/<name>')
+def _remote_image_info(name: str):
+    _ = name
+
     url: str = request.args.get('url')
     if not url or not url.startswith('http'):
         return jsonify(status=False,
