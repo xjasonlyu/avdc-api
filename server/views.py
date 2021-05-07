@@ -158,6 +158,17 @@ def _thumb_image(vid: str):
     return Response(data, mimetype=f'image/jpeg')
 
 
+@app.route('/imageinfo/remote')
+def _remote_image_info():
+    url: str = request.args.get('url')
+    if not url or not url.startswith('http'):
+        return jsonify(status=False,
+                       message=f'invalid url: {url}'), HTTPStatus.BAD_REQUEST
+
+    height, width = image.getRemoteImageSizeByURL(url)
+    return jsonify(height=height, width=width)
+
+
 @app.route('/imageinfo/backdrop/<vid>')
 @api.extract_vid
 def _backdrop_image_info(vid: str):
