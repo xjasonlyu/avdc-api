@@ -169,6 +169,7 @@ def _remote_image(name: str):
                        message=f'invalid url: {url}'), HTTPStatus.BAD_REQUEST
 
     data = image.getRawImageByURL(url)
+    _, width = image.getRawImageSize(data)
 
     scale: float = request.args.get('scale', type=float)
     if not scale:
@@ -178,7 +179,9 @@ def _remote_image(name: str):
     return Response(
         image.imageToBytes(
             image.cropImage(
-                image.bytesToImage(data), scale=scale, default_to_right=False, default_to_top=False)),
+                image.bytesToImage(data), scale=scale, center=width // 2,
+                default_to_right=False,
+                default_to_top=False)),
         mimetype=f'image/jpeg')
 
 
