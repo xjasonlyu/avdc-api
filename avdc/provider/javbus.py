@@ -1,4 +1,5 @@
 import re
+from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
 from lxml import etree
@@ -14,7 +15,8 @@ BASE_URL = 'https://www.javbus.com/ja'
 def getCover(text: str) -> str:  # 获取封面链接
     doc = pq(text)
     image = doc('a.bigImage')
-    return image.attr('href')
+    href: str = image.attr('href')
+    return href if href.startswith('http') else urljoin(BASE_URL, href)
 
 
 def getTitle(text: str) -> str:  # 获取标题
