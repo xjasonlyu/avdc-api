@@ -16,13 +16,16 @@ def parseVID(name: str) -> tuple[str, bool]:
     name, _ = splitext(name.strip())
     name = re.sub(r'[\-._]CD\d+$', '', name, flags=re.IGNORECASE)
 
+    if ' - ' in name:  # remove tags
+        name = name.split(' - ')[0]
+
     if name[-2:].upper() in ('-C', '-R'):
         return name[:-2], True
     return name, False
 
 
 if __name__ == '__main__':
-    print(parseVID('abp-113'))
+    print(parseVID('abp-113 - test'))
     print(parseVID('abp-113.mp4'))
     print(parseVID('abp-113-c-cd1.mp4'))
     print(parseVID('abp-113-C.cd2.mkv'))
