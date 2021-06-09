@@ -12,9 +12,7 @@ from server.database import Metadata, Actresses, Covers
 def GetMetadataByVID(vid: str) -> Optional[_M]:
     vid = vid.upper()
     try:
-        result: Metadata = Metadata.get((Metadata.vid == vid) |
-                                        (Metadata.vid == vid.replace('-', '_')) |
-                                        (Metadata.vid == vid.replace('_', '-')))
+        result: Metadata = Metadata.get(Metadata.vid == vid)
     except DoesNotExist:
         return
     return _M(**result.__data__)
@@ -45,9 +43,7 @@ def StoreActress(actress: _A, update: bool = False):
 def GetCoverByVID(vid: str) -> Optional[Cover]:
     vid = vid.upper()
     try:
-        result: Covers = Covers.get((Covers.vid == vid) |
-                                    (Covers.vid == vid.replace('-', '_')) |
-                                    (Covers.vid == vid.replace('_', '-')))
+        result: Covers = Covers.get(Covers.vid == vid)
     except DoesNotExist:
         return
 
