@@ -109,7 +109,7 @@ def searchVID(keyword: str):
             items = re.findall(r, str(result))
             for vid in items:
                 vid = vid.strip().upper()
-                if vid.replace('-', '').replace('_', '').startswith(_keyword):
+                if vid.startswith(_keyword):
                     return vid
 
     search_page, search_page_uncensored = concurrentMap(
@@ -151,4 +151,4 @@ def main(keyword: str) -> Metadata:
 if __name__ == "__main__":
     # print(main('ipx-292'))
     # print(main('111820-001'))
-    print(main('IESM-058'))
+    print(main('012321-001'))
