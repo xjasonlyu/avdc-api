@@ -5,6 +5,7 @@ services:
   avdc:
     image: ghcr.io/xjasonlyu/avdc-api:latest
     environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/key.json
       - HTTP_PROXY=http://192.168.1.1:1080
       - HTTPS_PROXY=http://192.168.1.1:1080
       - AVDC_DATABASE=sqlite:///avdc.db
@@ -12,6 +13,7 @@ services:
     ports:
       - 5000:5000
     volumes:
+      - ./key.json:/key.json:ro
       - ./avdc.db:/avdc.db
     network_mode: bridge
     restart: unless-stopped

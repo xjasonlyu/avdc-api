@@ -1,4 +1,4 @@
-FROM xjasonlyu/face-recognition:latest
+FROM python:3.9-slim:latest
 LABEL org.opencontainers.image.source="https://github.com/xjasonlyu/avdc-api"
 
 WORKDIR /app
@@ -13,6 +13,8 @@ ENV HTTPS_PROXY=""
 
 ENV AVDC_DATABASE=""
 ENV AVDC_TOKEN=""
+
+ENV GOOGLE_APPLICATION_CREDENTIALS="/key.json"
 
 ENV PORT=5000
 ENTRYPOINT exec python -m main -p $PORT

@@ -5,8 +5,8 @@ from typing import Optional
 import numpy as np
 from PIL import Image, UnidentifiedImageError
 from cachetools import cached, TTLCache
-from face_recognition import face_locations
 
+from avdc.utility.face_api import detect_faces
 from avdc.utility.httpclient import get_blob, Session, ResponseStream
 from avdc.utility.imagesize import getSize
 
@@ -70,7 +70,8 @@ def getFaceCenter(loc: tuple[int, int, int, int]) -> tuple[int, int]:
 
 
 def findFaces(img: np.ndarray) -> list[tuple[int, int, int, int]]:
-    return face_locations(img, number_of_times_to_upsample=1)
+    return [(*reversed(face[0]), *reversed(face[2]))
+            for face in detect_faces(imageToBytes(img))]
 
 
 def sortFaces(faces: list[tuple[int, int, int, int]], reverse: bool = True):
@@ -129,7 +130,7 @@ def autoCropImage(img: np.ndarray, face_detection: bool = True, pos: float = -1,
 
 
 if __name__ == '__main__':
-    i = getRawImageByURL('https://pics.javbus.com/cover/7zjh_b.jpg')
-    j = autoCropImage(bytesToImage(i), face_detection=False, scale=16 / 9, default_to_top=False)
+    i = getRawImageByURL('https://www.javbus.com/imgs/cover/1hk2_b.jpg')
+    j = autoCropImage(bytesToImage(i), face_detection=True, scale=0.66, default_to_top=False, default_to_right=False)
     Image.fromarray(j).show()
     # print(getRawImageFormat(i))
