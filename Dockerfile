@@ -1,4 +1,4 @@
-FROM python:3.9-slim:latest
+FROM python:3.9-slim
 LABEL org.opencontainers.image.source="https://github.com/xjasonlyu/avdc-api"
 
 WORKDIR /app
