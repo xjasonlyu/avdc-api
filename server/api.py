@@ -251,7 +251,8 @@ def GetPrimaryImageByVID(vid: str, *args, **kwargs) -> Optional[bytes]:
             or _is_in_s_list(vid):
         face_detection = True
 
-    return imageToBytes(autoCropImage(bytesToImage(cover.data), pos=cover.pos, face_detection=face_detection))
+    return imageToBytes(autoCropImage(bytesToImage(cover.data),
+                                      pos=cover.pos, face_detection=face_detection, default_to_right=False))
 
 
 def GetThumbImageByVID(vid: str, *args, **kwargs) -> Optional[bytes]:
