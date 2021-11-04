@@ -114,9 +114,9 @@ def cropImage(img: np.ndarray,
 
 def autoCropImage(img: np.ndarray, face_detection: bool = True, pos: float = -1, **options) -> np.ndarray:
     if not face_detection or 0 <= pos <= 1:
+        options['default_to_right'] = False
         return cropImage(img,
                          center=int(pos * getImageSize(img)[1]),
-                         default_to_right=False,
                          **options)
 
     # find and sort faces

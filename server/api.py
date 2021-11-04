@@ -244,15 +244,17 @@ def GetPrimaryImageByVID(vid: str, *args, **kwargs) -> Optional[bytes]:
             return
 
     face_detection = False  # disabled by default
+    default_to_right = True
     if re.match(r'^\d+[\-_]\d+', vid, re.IGNORECASE) \
             or re.match(r'^\d+[a-zA-Z]+[\-_]\d+', vid, re.IGNORECASE) \
             or re.match(r'^n\d+', vid, re.IGNORECASE) \
             or [i for i in ('HEYZO', 'BD', 'HD', '3D', 'MSFH') if i in vid.upper()] \
             or _is_in_s_list(vid):
         face_detection = True
+        default_to_right = False
 
     return imageToBytes(autoCropImage(bytesToImage(cover.data),
-                                      pos=cover.pos, face_detection=face_detection, default_to_right=False))
+                                      pos=cover.pos, face_detection=face_detection, default_to_right=default_to_right))
 
 
 def GetThumbImageByVID(vid: str, *args, **kwargs) -> Optional[bytes]:
