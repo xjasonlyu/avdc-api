@@ -26,7 +26,7 @@ API Version
 ## Features
 
 - Flask-based server is compatible with [Jellyfin.Plugin.AVDC](https://github.com/xjasonlyu/jellyfin-plugin-avdc)
-- Cover image can be cropped based on [face_recognition](https://github.com/ageitgey/face_recognition)
+- Cover image can be cropped based on [Google Vision](https://cloud.google.com/vision/docs/detecting-faces)
 - Metadata can be stored in Database (e.g. Sqlite, Mysql)
 
 ## Document
