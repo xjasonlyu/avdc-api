@@ -14,11 +14,12 @@ def getTitle(a: str) -> str:
 
 def getActresses(a: str) -> list[str]:  # //*[@id="center_column"]/div[2]/div[1]/div/table/tbody/tr[1]/td/text()
     html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-    result1 = str(html.xpath('//strong[contains(text(),"演員")]/../span/text()')).strip(" ['']")
-    result2 = str(html.xpath('//strong[contains(text(),"演員")]/../span/a/text()')).strip(" ['']")
-    actresses = str(result1 + result2).strip('+').replace(",\\xa0", "").replace("'", ""). \
-        replace(' ', '').replace(',,', '').replace('N/A', '').lstrip(',').replace(',', ', ')
-    return [i.strip() for i in actresses.split(',')]
+    result1 = html.xpath('//strong[contains(text(),"演員")]/../span/text()')
+    result2 = html.xpath('//strong[contains(text(),"演員")]/../span/a/text()')
+    # actresses = str(result1 + result2).strip('+').replace(",\\xa0", "").replace("'", ""). \
+    #     replace(' ', '').replace(',,', '').replace('N/A', '').lstrip(',').replace(',', ', ')
+    return [i.replace('N/A', '').strip('+').strip() for i in result1 + result2
+            if i.replace('N/A', '').strip('+').strip()]
 
 
 def getOnePhoto(url: str) -> str:
@@ -229,4 +230,4 @@ if __name__ == "__main__":
     # print(main('BANK-022'))
     # print(main('MIAE-003'))
     # print(main('ABW-065'))
-    print(main('mide-460'))
+    print(main('021022_001'))
